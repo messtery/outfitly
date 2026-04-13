@@ -1,21 +1,21 @@
 # outfitly
 
 ## Feature List
-1. Home Page
-2. About Us
-3. Contact Us
-4. FAQ
-5. Shop Page
-6. Category Page
-7. Product Detail Page
-8. Cart Page
-9. Checkout Page
-10. Payment Confirmation Page
-11. Order History Page
-12. Login Page
-13. Register Page
-14. User Profile Page
-15. Change Password Page
+1. Login Page
+2. Register Page
+3. User Profile Page
+4. Change Password Page
+5. Home Page
+6. About Us
+7. Contact Us
+8. FAQ
+9. Shop Page
+10. Category Page
+11. Product Detail Page
+12. Cart Page
+13. Checkout Page
+14. Payment Confirmation Page
+15. Order History Page
 16. Blog List Page
 17. Blog Detail Page
 18. Privacy Policy Page
@@ -27,3 +27,10 @@ User sometimes getting confused to find specific product, if there are so many o
 
 ## Solution with AI Implementation
 Search feature using NLP
+
+## Timeline
+**Sprint Week-1**: feature 1 - 4
+
+**Sprint Week-2**: feature 5-15
+
+**Sprint Week-2**: feature 16-20
