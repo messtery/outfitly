@@ -1,7 +1,7 @@
 # outfitly
 
 ## Feature List
-Student App
+### Student App
 1. Registration
 2. Login
 3. Browse Canteen Menus
@@ -18,7 +18,7 @@ Student App
 14. Profile Management
 15. Change Password
 
-Vendor App
+### Vendor App
 16. Menu Management
 17. Inventory Management
 18. Order Management
