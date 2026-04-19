@@ -1,32 +1,29 @@
 # outfitly
 
 ## Feature List
-1. Login Page
-2. Register Page
-3. User Profile Page
-4. Change Password Page
-5. Home Page
-6. About Us
-7. Contact Us
-8. FAQ
-9. Shop Page
-10. Category Page
-11. Product Detail Page
-12. Cart Page
-13. Checkout Page
-14. Payment Confirmation Page
-15. Order History Page
-16. Blog List Page
-17. Blog Detail Page
-18. Privacy Policy Page
-19. Terms & Condition
-20. Search Product with NLP (AI Implementation)
+Student App
+1. Registration
+2. Login
+3. Browse Canteen Menus
+4. Search & Filter Menus
+5. Cart & Checkout
+6. Payment Method Selection
+7. Order Status Tracking
+8. Estimated Waiting Time Prediction (AI)
+9. Menu Recommendation (AI)
+10. Favorite Menus
+11. Order History
+12. Reorder
+13. Notifications
+14. Profile Management
+15. Change Password
 
-## Problem to solve
-User sometimes getting confused to find specific product, if there are so many options
-
-## Solution with AI Implementation
-Search feature using NLP
+Vendor App
+16. Menu Management
+17. Inventory Management
+18. Order Management
+19. Daily Revenue Prediction (AI)
+20. Peak Hour Insights
 
 ## Timeline
 **Sprint Week-1**: feature 1 - 4
