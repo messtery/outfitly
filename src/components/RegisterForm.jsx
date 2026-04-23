@@ -1,29 +1,55 @@
 import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 
 export default function RegisterForm() {
   return (
-    <Card className="w-[350px] mx-auto  bg-gray-100 border border-gray-300">
+    <Card className="w-full max-w-sm">
       <CardHeader>
-        <h2 className="text-xl font-bold text-center w-full text-black">Signup</h2>
+        <CardTitle>Register your account</CardTitle>
+        <CardDescription>
+          Enter your account detail to register your account
+        </CardDescription>
       </CardHeader>
       <CardContent>
-        <form className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="email" className="text-black">Email</Label>
-            <Input id="email" type="email" placeholder="Enter your email" className="border border-gray-300"/>
+        <form>
+          <div className="flex flex-col gap-6">
+            <div className="grid gap-2">
+              <Label htmlFor="email">Email</Label>
+              <Input
+                id="email"
+                type="email"
+                placeholder="john@example.com"
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password">Password</Label>
+              </div>
+              <Input id="password" type="password" required />
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="password-confirmation">Password Confirmation</Label>
+              </div>
+              <Input id="password-confirmation" type="password" required />
+            </div>
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="password" className="text-black">Password</Label>
-            <Input id="password" type="password" placeholder="Enter your password" className="border border-gray-300"/>
-          </div>
-          <Button type="submit" className="w-full border border-gray-300">Create Account</Button>
         </form>
       </CardContent>
-      <CardFooter>
-        <p className="text-sm text-black">Already have an account? Login</p>
+      <CardFooter className="flex-col gap-2">
+        <Button type="submit" className="w-full hover:cursor-pointer">
+          Register
+        </Button>
       </CardFooter>
     </Card>
   )
