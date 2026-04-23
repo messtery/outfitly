@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useRef, useState } from "react"
 
 type Product = {
   id: number
@@ -14,6 +14,11 @@ const initialProducts: Product[] = [
 
 export default function AdminProductManagement() {
   const [products, setProducts] = useState<Product[]>(initialProducts)
+  const nextProductId = useRef(
+    initialProducts.length
+      ? Math.max(...initialProducts.map((product) => product.id)) + 1
+      : 1,
+  )
   const [name, setName] = useState("")
   const [category, setCategory] = useState("")
   const [price, setPrice] = useState("")
@@ -46,12 +51,13 @@ export default function AdminProductManagement() {
       setProducts((prev) => [
         ...prev,
         {
-          id: prev.length ? Math.max(...prev.map((product) => product.id)) + 1 : 1,
+          id: nextProductId.current,
           name: name.trim(),
           category: category.trim(),
           price: parsedPrice,
         },
       ])
+      nextProductId.current += 1
       resetForm()
       return
     }
@@ -92,21 +98,24 @@ export default function AdminProductManagement() {
       <form onSubmit={handleSubmit} className="mb-8 grid gap-3 md:grid-cols-4">
         <input
           className="rounded border p-2"
+          aria-label="Product name"
           placeholder="Name"
           value={name}
           onChange={(event) => setName(event.target.value)}
         />
         <input
           className="rounded border p-2"
+          aria-label="Product category"
           placeholder="Category"
           value={category}
           onChange={(event) => setCategory(event.target.value)}
         />
         <input
           className="rounded border p-2"
+          aria-label="Product price"
           placeholder="Price"
           type="number"
-          min="0"
+          min="1"
           value={price}
           onChange={(event) => setPrice(event.target.value)}
         />
