@@ -18,19 +18,27 @@ export default function AdminProductManagement() {
   const [category, setCategory] = useState("")
   const [price, setPrice] = useState("")
   const [editingProductId, setEditingProductId] = useState<number | null>(null)
+  const [errorMessage, setErrorMessage] = useState("")
 
   const resetForm = () => {
     setName("")
     setCategory("")
     setPrice("")
     setEditingProductId(null)
+    setErrorMessage("")
   }
 
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     const parsedPrice = Number(price)
 
-    if (!name.trim() || !category.trim() || Number.isNaN(parsedPrice)) {
+    if (
+      !name.trim() ||
+      !category.trim() ||
+      Number.isNaN(parsedPrice) ||
+      parsedPrice <= 0
+    ) {
+      setErrorMessage("Please fill all fields and use a price greater than 0.")
       return
     }
 
@@ -120,6 +128,11 @@ export default function AdminProductManagement() {
           ) : null}
         </div>
       </form>
+      {errorMessage ? (
+        <p className="mb-4 text-sm text-red-600" role="alert">
+          {errorMessage}
+        </p>
+      ) : null}
 
       <div className="overflow-x-auto">
         <table className="w-full border-collapse">
