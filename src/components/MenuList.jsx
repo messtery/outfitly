@@ -11,7 +11,7 @@ const menuData = [
   { id: 5, name: "Ayam Geprek", category: "Makanan", price: 18000 },
 ];
 
-export default function CanteenMenu() {
+export default function MenuList() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
 
