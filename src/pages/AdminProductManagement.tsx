@@ -1,4 +1,15 @@
 import { useRef, useState } from "react"
+import { Button } from "@/components/ui/button"
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Separator } from "@/components/ui/separator"
 
 type Product = {
   id: number
@@ -92,98 +103,136 @@ export default function AdminProductManagement() {
   }
 
   return (
-    <div className="mx-auto max-w-5xl p-6">
-      <h1 className="mb-6 text-3xl font-bold">Admin Product Management</h1>
+    <div className="mx-auto max-w-6xl p-6">
+      <div className="grid gap-6 md:grid-cols-[240px_1fr]">
+        <Card size="sm" className="h-fit">
+          <CardHeader>
+            <CardTitle>Admin Panel</CardTitle>
+            <CardDescription>Manage your data</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-2">
+            <Button variant="secondary" className="w-full justify-start">
+              Products
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
+              Categories
+            </Button>
+            <Button variant="ghost" className="w-full justify-start">
+              Orders
+            </Button>
+          </CardContent>
+        </Card>
 
-      <form onSubmit={handleSubmit} className="mb-8 grid gap-3 md:grid-cols-4">
-        <input
-          className="rounded border p-2"
-          aria-label="Product name"
-          placeholder="Name"
-          value={name}
-          onChange={(event) => setName(event.target.value)}
-        />
-        <input
-          className="rounded border p-2"
-          aria-label="Product category"
-          placeholder="Category"
-          value={category}
-          onChange={(event) => setCategory(event.target.value)}
-        />
-        <input
-          className="rounded border p-2"
-          aria-label="Product price"
-          placeholder="Price"
-          type="number"
-          min="1"
-          value={price}
-          onChange={(event) => setPrice(event.target.value)}
-        />
-        <div className="flex gap-2">
-          <button
-            type="submit"
-            className="rounded bg-black px-4 py-2 text-white hover:cursor-pointer"
-          >
-            {editingProductId === null ? "Create" : "Update"}
-          </button>
-          {editingProductId !== null ? (
-            <button
-              type="button"
-              className="rounded border px-4 py-2 hover:cursor-pointer"
-              onClick={resetForm}
-            >
-              Cancel
-            </button>
-          ) : null}
+        <div className="space-y-6">
+          <Card>
+            <CardHeader>
+              <CardTitle>Product Management</CardTitle>
+              <CardDescription>Create, update, and delete products.</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+                <div className="grid gap-2">
+                  <Label htmlFor="product-name">Name</Label>
+                  <Input
+                    id="product-name"
+                    aria-label="Product name"
+                    placeholder="Name"
+                    value={name}
+                    onChange={(event) => setName(event.target.value)}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="product-category">Category</Label>
+                  <Input
+                    id="product-category"
+                    aria-label="Product category"
+                    placeholder="Category"
+                    value={category}
+                    onChange={(event) => setCategory(event.target.value)}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="product-price">Price</Label>
+                  <Input
+                    id="product-price"
+                    aria-label="Product price"
+                    placeholder="Price"
+                    type="number"
+                    min="1"
+                    value={price}
+                    onChange={(event) => setPrice(event.target.value)}
+                  />
+                </div>
+                <div className="flex items-end gap-2">
+                  <Button type="submit">
+                    {editingProductId === null ? "Create" : "Update"}
+                  </Button>
+                  {editingProductId !== null ? (
+                    <Button type="button" variant="outline" onClick={resetForm}>
+                      Cancel
+                    </Button>
+                  ) : null}
+                </div>
+              </form>
+              {errorMessage ? (
+                <p className="mt-3 text-sm text-destructive" role="alert">
+                  {errorMessage}
+                </p>
+              ) : null}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle>Products</CardTitle>
+            </CardHeader>
+            <CardContent className="overflow-x-auto">
+              <table className="w-full border-collapse text-sm">
+                <thead>
+                  <tr className="border-b text-left">
+                    <th className="p-2 font-medium">#</th>
+                    <th className="p-2 font-medium">Name</th>
+                    <th className="p-2 font-medium">Category</th>
+                    <th className="p-2 font-medium">Price</th>
+                    <th className="p-2 font-medium">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {products.map((product, index) => (
+                    <tr key={product.id} className="border-b last:border-b-0">
+                      <td className="p-2">{index + 1}</td>
+                      <td className="p-2">{product.name}</td>
+                      <td className="p-2">{product.category}</td>
+                      <td className="p-2">Rp {product.price.toLocaleString("id-ID")}</td>
+                      <td className="p-2">
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => handleEdit(product)}
+                          >
+                            Edit
+                          </Button>
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            onClick={() => handleDelete(product.id)}
+                          >
+                            Delete
+                          </Button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </CardContent>
+          </Card>
         </div>
-      </form>
-      {errorMessage ? (
-        <p className="mb-4 text-sm text-red-600" role="alert">
-          {errorMessage}
-        </p>
-      ) : null}
-
-      <div className="overflow-x-auto">
-        <table className="w-full border-collapse">
-          <thead>
-            <tr className="border-b text-left">
-              <th className="p-2">#</th>
-              <th className="p-2">Name</th>
-              <th className="p-2">Category</th>
-              <th className="p-2">Price</th>
-              <th className="p-2">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {products.map((product, index) => (
-              <tr key={product.id} className="border-b">
-                <td className="p-2">{index + 1}</td>
-                <td className="p-2">{product.name}</td>
-                <td className="p-2">{product.category}</td>
-                <td className="p-2">{product.price}</td>
-                <td className="p-2">
-                  <div className="flex gap-2">
-                    <button
-                      type="button"
-                      className="rounded border px-3 py-1 hover:cursor-pointer"
-                      onClick={() => handleEdit(product)}
-                    >
-                      Edit
-                    </button>
-                    <button
-                      type="button"
-                      className="rounded border px-3 py-1 hover:cursor-pointer"
-                      onClick={() => handleDelete(product.id)}
-                    >
-                      Delete
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
       </div>
+      <Separator className="mt-6" />
     </div>
   )
 }
