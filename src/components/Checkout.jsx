@@ -39,9 +39,6 @@ export default function Checkout({ }) {
             </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-end">
-          <Button className="bg-black text-white">Confirm Order</Button>
-        </CardFooter>
       </Card>
     </div>
   )
