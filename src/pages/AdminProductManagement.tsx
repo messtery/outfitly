@@ -104,13 +104,17 @@ export default function AdminProductManagement() {
   return (
     <div className="mx-auto max-w-6xl p-6">
       <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-        <Card size="sm" className="h-fit">
+        <Card className="h-fit">
           <CardHeader>
             <CardTitle>Admin Panel</CardTitle>
             <CardDescription>Manage your data</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2">
-            <Button variant="secondary" className="w-full justify-start">
+          <CardContent className="space-y-2" role="navigation" aria-label="Admin sidebar">
+            <Button
+              variant="secondary"
+              className="w-full justify-start"
+              aria-current="page"
+            >
               Products
             </Button>
             <Button variant="ghost" className="w-full justify-start">
