@@ -109,20 +109,20 @@ export default function AdminProductManagement() {
             <CardTitle>Admin Panel</CardTitle>
             <CardDescription>Manage your data</CardDescription>
           </CardHeader>
-          <CardContent className="space-y-2" role="navigation" aria-label="Admin sidebar">
-            <Button
-              variant="secondary"
-              className="w-full justify-start"
-              aria-current="page"
-            >
-              Products
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              Categories
-            </Button>
-            <Button variant="ghost" className="w-full justify-start">
-              Orders
-            </Button>
+          <CardContent>
+            <nav aria-label="Admin sidebar" className="space-y-2">
+              <Button asChild variant="secondary" className="w-full justify-start">
+                <a href="/admin/products" aria-current="page">
+                  Products
+                </a>
+              </Button>
+              <Button asChild variant="ghost" className="w-full justify-start">
+                <a href="/admin/categories">Categories</a>
+              </Button>
+              <Button asChild variant="ghost" className="w-full justify-start">
+                <a href="/admin/orders">Orders</a>
+              </Button>
+            </nav>
           </CardContent>
         </Card>
 
