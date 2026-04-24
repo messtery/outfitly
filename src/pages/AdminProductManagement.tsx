@@ -21,6 +21,7 @@ const initialProducts: Product[] = [
   { id: 1, name: "Nasi Goreng", category: "Food", price: 15000 },
   { id: 2, name: "Es Teh", category: "Drink", price: 5000 },
 ]
+const categoryOptions = ["Food", "Drink"] as const
 
 export default function AdminProductManagement() {
   const [products, setProducts] = useState<Product[]>(initialProducts)
@@ -146,13 +147,20 @@ export default function AdminProductManagement() {
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="product-category">Category</Label>
-                  <Input
+                  <select
                     id="product-category"
                     aria-label="Product category"
-                    placeholder="Category"
+                    className="h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-sm transition-colors outline-none focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 dark:bg-input/30 dark:disabled:bg-input/80"
                     value={category}
                     onChange={(event) => setCategory(event.target.value)}
-                  />
+                  >
+                    <option value="">Select category</option>
+                    {categoryOptions.map((option) => (
+                      <option key={option} value={option}>
+                        {option}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="grid gap-2">
                   <Label htmlFor="product-price">Price</Label>
