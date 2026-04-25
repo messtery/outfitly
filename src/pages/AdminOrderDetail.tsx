@@ -3,44 +3,12 @@ import { Button } from "@/components/ui/button"
 import {
   Card,
   CardContent,
-  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import type { Order, PaymentStatus } from "@/types/order"
-
-const paymentStatusColors: Record<PaymentStatus, string> = {
-  Paid: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  Pending: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-  Failed: "bg-red-100 text-red-800 dark:bg-red-900/30 dark:text-red-400",
-  Refunded: "bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400",
-}
-
-function AdminSidebar() {
-  return (
-    <Card className="h-fit">
-      <CardHeader>
-        <CardTitle>Admin Panel</CardTitle>
-        <CardDescription>Manage your data</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <nav aria-label="Admin sidebar" className="space-y-2">
-          <Button asChild variant="ghost" className="w-full justify-start">
-            <a href="/admin/products">Products</a>
-          </Button>
-          <Button asChild variant="ghost" className="w-full justify-start">
-            <a href="/admin/categories">Categories</a>
-          </Button>
-          <Button asChild variant="secondary" className="w-full justify-start">
-            <a href="/admin/orders" aria-current="page">
-              Orders
-            </a>
-          </Button>
-        </nav>
-      </CardContent>
-    </Card>
-  )
-}
+import AdminSidebar from "@/components/AdminSidebar"
+import type { Order } from "@/types/order"
+import { paymentStatusColors } from "@/types/order"
 
 export default function AdminOrderDetail() {
   const location = useLocation()
@@ -51,7 +19,7 @@ export default function AdminOrderDetail() {
     return (
       <div className="mx-auto max-w-6xl p-6">
         <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-          <AdminSidebar />
+          <AdminSidebar currentPage="orders" />
           <Card>
             <CardContent className="p-6">
               <p className="text-muted-foreground">Order not found.</p>
@@ -68,7 +36,7 @@ export default function AdminOrderDetail() {
   return (
     <div className="mx-auto max-w-6xl p-6">
       <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-        <AdminSidebar />
+        <AdminSidebar currentPage="orders" />
 
         <div className="space-y-6">
           <div className="flex items-center gap-4">
