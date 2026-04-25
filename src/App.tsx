@@ -3,6 +3,8 @@ import TestPage from './pages/TestPage';
 import Register from './pages/Register.jsx';
 import Menu from './pages/Menu.jsx';
 import AdminProductManagement from './pages/AdminProductManagement';
+import AdminOrderManagement from './pages/AdminOrderManagement';
+import AdminOrderDetail from './pages/AdminOrderDetail';
 
 function App() {
   return (
@@ -12,6 +14,8 @@ function App() {
         <Route path="/register" element={<Register />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/admin/products" element={<AdminProductManagement />} />
+        <Route path="/admin/orders" element={<AdminOrderManagement />} />
+        <Route path="/admin/orders/:id" element={<AdminOrderDetail />} />
       </Routes>
     </BrowserRouter>
   );
