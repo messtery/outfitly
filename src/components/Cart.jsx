@@ -4,14 +4,14 @@ import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { Table, TableHeader, TableRow, TableCell, TableBody } from "./ui/table"
 
-// const initialCart = [
-//   { id: 1, name: "Nasi Goreng", category: "Makanan", price: 15000, qty: 1, image: "/images/nasi-goreng.jpg" },
-//   { id: 2, name: "Es Teh", category: "Minuman", price: 5000, qty: 2, image: "/images/es-teh.jpg" },
-//   { id: 3, name: "Ayam Geprek", category: "Makanan", price: 18000, qty: 1, image: "/images/ayam-geprek.jpg" },
-// ]
+export default function Cart({}) {
+  const initialCart = [
+    { id: 1, name: "Nasi Goreng", category: "Makanan", price: 15000, qty: 1, image: "/images/nasi-goreng.jpg" },
+    { id: 2, name: "Es Teh", category: "Minuman", price: 5000, qty: 2, image: "/images/es-teh.jpg" },
+    { id: 3, name: "Ayam Geprek", category: "Makanan", price: 18000, qty: 1, image: "/images/ayam-geprek.jpg" },
+  ]
 
-export default function Cart({ cart, setCart }) {
-//   const [cart, setCart] = useState(initialCart)
+  const [cart, setCart] = useState(initialCart)
 
   const updateQty = (id, newQty) => {
     setCart(prev =>
@@ -45,7 +45,7 @@ export default function Cart({ cart, setCart }) {
                   <img src={item.image} alt={item.name} className="w-12 h-12 rounded-md object-cover" />
                   <div>
                     <span className="block">{item.name}</span>
-                    {/* Label kategori */}
+
                     <span className="text-xs text-gray-400">{item.category}</span>
                   </div>
                 </TableCell>

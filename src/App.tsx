@@ -4,11 +4,10 @@ import Register from './pages/Register.jsx';
 import Menu from './pages/Menu.jsx';
 import CartPage from './pages/CartPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
-import { CartProvider } from "./components/CartContext"
+import OrderTrackingPage from './pages/OrderTrackingPage'
 
 function App() {
   return (
-    <CartProvider>
       <BrowserRouter>
         <Routes>
           <Route path="/test" element={<TestPage />} />
@@ -16,9 +15,9 @@ function App() {
           <Route path="/menu" element={<Menu />} />
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/ordertracking" element={<OrderTrackingPage />} />
         </Routes>
       </BrowserRouter>
-    </CartProvider>
   );
 }
 
