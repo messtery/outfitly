@@ -1,4 +1,3 @@
-// components/order/OrderEstimate.jsx
 import { Card } from "@/components/ui/card"
 
 export default function OrderEstimate({ minutes }) {

@@ -1,10 +1,9 @@
-// components/order/OrderTimeline.jsx
 import { Progress } from "@/components/ui/progress"
 
 const steps = ["received", "processing", "ready", "completed"]
 
 export default function OrderTimeline({ currentStatus }) {
-  // hitung index status saat ini
+  
   const currentIndex = steps.indexOf(currentStatus)
   const progressValue = ((currentIndex + 1) / steps.length) * 100
 
