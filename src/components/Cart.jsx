@@ -47,7 +47,6 @@ export default function Cart({}) {
                   <img src={item.image} alt={item.name} className="w-12 h-12 rounded-md object-cover" />
                   <div>
                     <span className="block">{item.name}</span>
-
                     <span className="text-xs text-gray-400">{item.category}</span>
                   </div>
                 </TableCell>
