@@ -42,11 +42,20 @@ export default function AdminDashboard() {
   const hourlyData = buildHourlyData(orders)
   const maxCount = Math.max(...hourlyData.map((d) => d.count), 1)
 
-  const chartHeight = 160
-  const barAreaHeight = chartHeight - 24
+  const chartHeight = 180
+  const xAxisHeight = 20
+  const countLabelHeight = 14
+  const barAreaHeight = chartHeight - xAxisHeight - countLabelHeight
   const barWidth = 14
   const barGap = 4
-  const chartWidth = hourlyData.length * (barWidth + barGap) - barGap
+  const yAxisWidth = 28
+  const barsWidth = hourlyData.length * (barWidth + barGap) - barGap
+  const chartWidth = yAxisWidth + barsWidth
+
+  // Y-axis ticks: 0, midpoint, max
+  const yTicks = Array.from(
+    new Set([0, Math.round(maxCount / 2), maxCount])
+  ).sort((a, b) => a - b)
 
   return (
     <div className="mx-auto max-w-6xl p-6">
@@ -96,32 +105,66 @@ export default function AdminDashboard() {
                   preserveAspectRatio="xMidYMid meet"
                   style={{ width: "100%", height: "auto" }}
                 >
+                  {/* Y-axis gridlines and labels */}
+                  {yTicks.map((tick) => {
+                    const tickY =
+                      countLabelHeight +
+                      barAreaHeight -
+                      (tick / maxCount) * barAreaHeight
+                    return (
+                      <g key={tick}>
+                        <line
+                          x1={yAxisWidth}
+                          y1={tickY}
+                          x2={chartWidth}
+                          y2={tickY}
+                          stroke="currentColor"
+                          strokeOpacity={0.1}
+                          strokeWidth={1}
+                        />
+                        <text
+                          x={yAxisWidth - 4}
+                          y={tickY + 3}
+                          textAnchor="end"
+                          fontSize={8}
+                          className="fill-muted-foreground"
+                        >
+                          {tick}
+                        </text>
+                      </g>
+                    )
+                  })}
+
+                  {/* Bars */}
                   {hourlyData.map(({ hour, count }) => {
-                    const x = hour * (barWidth + barGap)
+                    const x = yAxisWidth + hour * (barWidth + barGap)
                     const barH =
                       count === 0 ? 2 : (count / maxCount) * barAreaHeight
-                    const y = barAreaHeight - barH
+                    const barY = countLabelHeight + barAreaHeight - barH
                     return (
                       <g key={hour}>
                         <rect
                           x={x}
-                          y={y}
+                          y={barY}
                           width={barWidth}
                           height={barH}
                           rx={2}
                           className={count > 0 ? "fill-primary" : "fill-muted"}
                         />
+                        {/* Count label above bar */}
                         {count > 0 ? (
                           <text
                             x={x + barWidth / 2}
-                            y={y - 3}
+                            y={barY - 3}
                             textAnchor="middle"
                             fontSize={8}
+                            fontWeight="600"
                             className="fill-foreground"
                           >
                             {count}
                           </text>
                         ) : null}
+                        {/* Hour label on x-axis */}
                         <text
                           x={x + barWidth / 2}
                           y={chartHeight - 4}
