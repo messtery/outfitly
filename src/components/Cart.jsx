@@ -3,6 +3,7 @@ import { Card, CardHeader, CardContent, CardFooter } from "./ui/card"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
 import { Table, TableHeader, TableRow, TableCell, TableBody } from "./ui/table"
+import { useNavigate } from "react-router-dom"
 
 export default function Cart({}) {
   const initialCart = [
@@ -12,6 +13,7 @@ export default function Cart({}) {
   ]
 
   const [cart, setCart] = useState(initialCart)
+  const navigate = useNavigate()
 
   const updateQty = (id, newQty) => {
     setCart(prev =>
@@ -76,7 +78,7 @@ export default function Cart({}) {
         </div>
       </CardContent>
       <CardFooter className="flex justify-end">
-        <Button className="bg-black text-white">Confirm Order</Button>
+        <Button className="bg-black text-white" onClick={() => navigate('/checkout')}>Checkout</Button>
       </CardFooter>
     </Card>
   )
