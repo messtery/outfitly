@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import AdminSidebar from "@/components/AdminSidebar"
 
 type Category = {
   id: number
@@ -26,10 +27,12 @@ export default function AdminCategoryManagement() {
   const nextCategoryId = useRef(
     initialCategories.length
       ? Math.max(...initialCategories.map((c) => c.id)) + 1
-      : 1,
+      : 1
   )
   const [name, setName] = useState("")
-  const [editingCategoryId, setEditingCategoryId] = useState<number | null>(null)
+  const [editingCategoryId, setEditingCategoryId] = useState<number | null>(
+    null
+  )
   const [errorMessage, setErrorMessage] = useState("")
 
   const resetForm = () => {
@@ -62,8 +65,8 @@ export default function AdminCategoryManagement() {
 
     setCategories((prev) =>
       prev.map((c) =>
-        c.id === editingCategoryId ? { ...c, name: name.trim() } : c,
-      ),
+        c.id === editingCategoryId ? { ...c, name: name.trim() } : c
+      )
     )
     resetForm()
   }
@@ -78,7 +81,7 @@ export default function AdminCategoryManagement() {
     const category = categories.find((c) => c.id === id)
     if (category && category.totalProducts > 0) {
       setErrorMessage(
-        `Cannot delete "${category.name}" because it has ${category.totalProducts} associated product(s).`,
+        `Cannot delete "${category.name}" because it has ${category.totalProducts} associated product(s).`
       )
       return
     }
@@ -91,36 +94,21 @@ export default function AdminCategoryManagement() {
   return (
     <div className="mx-auto max-w-6xl p-6">
       <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-        <Card className="h-fit">
-          <CardHeader>
-            <CardTitle>Admin Panel</CardTitle>
-            <CardDescription>Manage your data</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <nav aria-label="Admin sidebar" className="space-y-2">
-              <Button asChild variant="ghost" className="w-full justify-start">
-                <a href="/admin/products">Products</a>
-              </Button>
-              <Button asChild variant="secondary" className="w-full justify-start">
-                <a href="/admin/categories" aria-current="page">
-                  Categories
-                </a>
-              </Button>
-              <Button asChild variant="ghost" className="w-full justify-start">
-                <a href="/admin/orders">Orders</a>
-              </Button>
-            </nav>
-          </CardContent>
-        </Card>
+        <AdminSidebar currentPage="categories" />
 
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Category Management</CardTitle>
-              <CardDescription>Create, update, and delete categories.</CardDescription>
+              <CardDescription>
+                Create, update, and delete categories.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+              <form
+                onSubmit={handleSubmit}
+                className="grid gap-4 md:grid-cols-2"
+              >
                 <div className="grid gap-2">
                   <Label htmlFor="category-name">Name</Label>
                   <Input
