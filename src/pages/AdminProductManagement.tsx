@@ -9,6 +9,7 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import AdminSidebar from "@/components/AdminSidebar"
 
 type Product = {
   id: number
@@ -30,7 +31,7 @@ export default function AdminProductManagement() {
   const nextProductId = useRef(
     initialProducts.length
       ? Math.max(...initialProducts.map((product) => product.id)) + 1
-      : 1,
+      : 1
   )
   const [name, setName] = useState("")
   const [category, setCategory] = useState("")
@@ -84,8 +85,8 @@ export default function AdminProductManagement() {
               category: category.trim(),
               price: parsedPrice,
             }
-          : product,
-      ),
+          : product
+      )
     )
     resetForm()
   }
@@ -107,36 +108,21 @@ export default function AdminProductManagement() {
   return (
     <div className="mx-auto max-w-6xl p-6">
       <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-        <Card className="h-fit">
-          <CardHeader>
-            <CardTitle>Admin Panel</CardTitle>
-            <CardDescription>Manage your data</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <nav aria-label="Admin sidebar" className="space-y-2">
-              <Button asChild variant="secondary" className="w-full justify-start">
-                <a href="/admin/products" aria-current="page">
-                  Products
-                </a>
-              </Button>
-              <Button asChild variant="ghost" className="w-full justify-start">
-                <a href="/admin/categories">Categories</a>
-              </Button>
-              <Button asChild variant="ghost" className="w-full justify-start">
-                <a href="/admin/orders">Orders</a>
-              </Button>
-            </nav>
-          </CardContent>
-        </Card>
+        <AdminSidebar currentPage="products" />
 
         <div className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle>Product Management</CardTitle>
-              <CardDescription>Create, update, and delete products.</CardDescription>
+              <CardDescription>
+                Create, update, and delete products.
+              </CardDescription>
             </CardHeader>
             <CardContent>
-              <form onSubmit={handleSubmit} className="grid gap-4 md:grid-cols-2">
+              <form
+                onSubmit={handleSubmit}
+                className="grid gap-4 md:grid-cols-2"
+              >
                 <div className="grid gap-2">
                   <Label htmlFor="product-name">Name</Label>
                   <Input
@@ -216,7 +202,9 @@ export default function AdminProductManagement() {
                       <td className="p-2">{index + 1}</td>
                       <td className="p-2">{product.name}</td>
                       <td className="p-2">{product.category}</td>
-                      <td className="p-2">Rp {product.price.toLocaleString("id-ID")}</td>
+                      <td className="p-2">
+                        Rp {product.price.toLocaleString("id-ID")}
+                      </td>
                       <td className="p-2">
                         <div className="flex gap-2">
                           <Button

@@ -60,11 +60,11 @@ export default function AdminDashboard() {
               <CardTitle>Order Summary</CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex flex-wrap gap-4">
+              <div className="grid grid-cols-2 gap-4 sm:grid-cols-4">
                 {statusCounts.map(({ status, label, count }) => (
                   <div
                     key={status}
-                    className={`flex items-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium ${paymentStatusColors[status]}`}
+                    className={`flex items-center justify-between gap-2 rounded-lg px-4 py-2.5 text-sm font-medium ${paymentStatusColors[status]}`}
                   >
                     <span>{label}</span>
                     <span className="rounded-full bg-white/30 px-2 py-0.5 text-xs font-bold">
