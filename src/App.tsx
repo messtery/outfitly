@@ -4,6 +4,7 @@ import Register from "./pages/Register.jsx"
 import Menu from "./pages/Menu.jsx"
 import CartPage from './pages/CartPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
+import ProfilePage from './pages/ProfilePage.jsx';
 import AdminProductManagement from "./pages/AdminProductManagement"
 import AdminOrderManagement from "./pages/AdminOrderManagement"
 import AdminOrderDetail from "./pages/AdminOrderDetail"
@@ -20,6 +21,7 @@ function App() {
         <Route path="/menu" element={<Menu />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
+        <Route path="/profile" element={<ProfilePage />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/products" element={<AdminProductManagement />} />
         <Route path="/admin/orders" element={<AdminOrderManagement />} />

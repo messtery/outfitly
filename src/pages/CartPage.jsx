@@ -1,10 +1,13 @@
 import Cart from "../components/Cart"
+import CustomerTopBar from "../components/CustomerTopBar"
+import CustomerBottomNav from "../components/CustomerBottomNav"
 
 export default function CartPage() {
     return (
-        <div className="min-h-screen p-6">
-            <h1 className="text-2xl font-bold mb-4">Cart</h1>
+        <div className="min-h-screen pb-20 pt-14 p-6 bg-gray-50">
+            <CustomerTopBar title="Cart" />
             <Cart />
+            <CustomerBottomNav />
         </div>
     )
 }
