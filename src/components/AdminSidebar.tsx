@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 
 type AdminSidebarProps = {
-  currentPage?: "dashboard" | "products" | "categories" | "orders"
+  currentPage?: "dashboard" | "products" | "categories" | "orders" | "customers"
 }
 
 export default function AdminSidebar({ currentPage }: AdminSidebarProps) {
@@ -72,6 +72,18 @@ export default function AdminSidebar({ currentPage }: AdminSidebarProps) {
               {...(currentPage === "orders" ? { "aria-current": "page" } : {})}
             >
               Orders
+            </a>
+          </Button>
+          <Button
+            asChild
+            variant={currentPage === "customers" ? "secondary" : "ghost"}
+            className="w-full justify-start"
+          >
+            <a
+              href="/admin/customers"
+              {...(currentPage === "customers" ? { "aria-current": "page" } : {})}
+            >
+              Customers
             </a>
           </Button>
         </nav>
