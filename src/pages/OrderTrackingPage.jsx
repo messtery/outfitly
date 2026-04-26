@@ -20,7 +20,6 @@ export default function OrderTrackingPage() {
       <OrderDetails items={order.details} />
       <OrderActions
         onCancel={() => console.log("Pesanan dibatalkan")}
-        onRepeat={() => console.log("Repeat order")}
       />
     </div>
   )
