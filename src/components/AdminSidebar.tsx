@@ -8,7 +8,7 @@ import {
 } from "@/components/ui/card"
 
 type AdminSidebarProps = {
-  currentPage?: "products" | "categories" | "orders"
+  currentPage?: "dashboard" | "products" | "categories" | "orders"
 }
 
 export default function AdminSidebar({ currentPage }: AdminSidebarProps) {
@@ -22,12 +22,28 @@ export default function AdminSidebar({ currentPage }: AdminSidebarProps) {
         <nav aria-label="Admin sidebar" className="space-y-2">
           <Button
             asChild
+            variant={currentPage === "dashboard" ? "secondary" : "ghost"}
+            className="w-full justify-start"
+          >
+            <a
+              href="/admin/dashboard"
+              {...(currentPage === "dashboard"
+                ? { "aria-current": "page" }
+                : {})}
+            >
+              Dashboard
+            </a>
+          </Button>
+          <Button
+            asChild
             variant={currentPage === "products" ? "secondary" : "ghost"}
             className="w-full justify-start"
           >
             <a
               href="/admin/products"
-              {...(currentPage === "products" ? { "aria-current": "page" } : {})}
+              {...(currentPage === "products"
+                ? { "aria-current": "page" }
+                : {})}
             >
               Products
             </a>
@@ -39,7 +55,9 @@ export default function AdminSidebar({ currentPage }: AdminSidebarProps) {
           >
             <a
               href="/admin/categories"
-              {...(currentPage === "categories" ? { "aria-current": "page" } : {})}
+              {...(currentPage === "categories"
+                ? { "aria-current": "page" }
+                : {})}
             >
               Categories
             </a>

@@ -13,56 +13,13 @@ import { Label } from "@/components/ui/label"
 import AdminSidebar from "@/components/AdminSidebar"
 import type { Order, OrderItem, PaymentStatus } from "@/types/order"
 import { paymentStatusColors } from "@/types/order"
+import { initialOrders } from "@/data/orders"
 
-const paymentStatusOptions: PaymentStatus[] = ["Paid", "Pending", "Failed", "Refunded"]
-
-const initialOrders: Order[] = [
-  {
-    id: "ORD-001",
-    customerName: "Alice Johnson",
-    phone: "08123456789",
-    shippingAddress: "123 Main St, Jakarta",
-    total: 45000,
-    paymentStatus: "Paid",
-    date: "2024-01-15",
-    items: [
-      { id: 1, productName: "Nasi Goreng", quantity: 2, price: 15000 },
-      { id: 2, productName: "Es Teh", quantity: 3, price: 5000 },
-    ],
-  },
-  {
-    id: "ORD-002",
-    customerName: "Bob Smith",
-    phone: "08987654321",
-    shippingAddress: "456 Oak Ave, Bandung",
-    total: 34000,
-    paymentStatus: "Pending",
-    date: "2024-01-16",
-    items: [
-      { id: 1, productName: "Mie Ayam", quantity: 2, price: 12000 },
-      { id: 2, productName: "Jus Alpukat", quantity: 1, price: 10000 },
-    ],
-  },
-  {
-    id: "ORD-003",
-    customerName: "Carol White",
-    phone: "08765432109",
-    shippingAddress: "789 Pine Rd, Surabaya",
-    total: 18000,
-    paymentStatus: "Failed",
-    date: "2024-01-17",
-    items: [{ id: 1, productName: "Ayam Geprek", quantity: 1, price: 18000 }],
-  },
-  {
-    id: "ORD-004",
-    customerName: "David Brown",
-    phone: "08234567890",
-    shippingAddress: "321 Elm St, Yogyakarta",
-    total: 20000,
-    paymentStatus: "Refunded",
-    date: "2024-01-18",
-    items: [{ id: 1, productName: "Jus Alpukat", quantity: 2, price: 10000 }],
-  },
+const paymentStatusOptions: PaymentStatus[] = [
+  "Paid",
+  "Pending",
+  "Failed",
+  "Refunded",
 ]
 
 const selectFieldClassName =
@@ -84,9 +41,9 @@ export default function AdminOrderManagement() {
           ...initialOrders.map((o) => {
             const num = parseInt(o.id.replace("ORD-", ""), 10)
             return Number.isNaN(num) ? 0 : num
-          }),
+          })
         ) + 1
-      : 1,
+      : 1
   )
 
   const [customerName, setCustomerName] = useState("")
@@ -113,7 +70,9 @@ export default function AdminOrderManagement() {
     items
       .filter(
         (item) =>
-          item.productName.trim() && Number(item.quantity) > 0 && Number(item.price) > 0,
+          item.productName.trim() &&
+          Number(item.quantity) > 0 &&
+          Number(item.price) > 0
       )
       .map((item, index) => ({
         id: index + 1,
@@ -128,7 +87,12 @@ export default function AdminOrderManagement() {
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault()
 
-    if (!customerName.trim() || !phone.trim() || !shippingAddress.trim() || !paymentStatus) {
+    if (
+      !customerName.trim() ||
+      !phone.trim() ||
+      !shippingAddress.trim() ||
+      !paymentStatus
+    ) {
       setErrorMessage("Please fill all required fields.")
       return
     }
@@ -170,8 +134,8 @@ export default function AdminOrderManagement() {
               paymentStatus: paymentStatus as PaymentStatus,
               items: orderItems,
             }
-          : order,
-      ),
+          : order
+      )
     )
     resetForm()
   }
@@ -186,7 +150,7 @@ export default function AdminOrderManagement() {
         productName: item.productName,
         quantity: String(item.quantity),
         price: String(item.price),
-      })),
+      }))
     )
     setEditingOrderId(order.id)
     setErrorMessage("")
@@ -204,7 +168,10 @@ export default function AdminOrderManagement() {
   }
 
   const addFormItem = () => {
-    setFormItems((prev) => [...prev, { productName: "", quantity: "", price: "" }])
+    setFormItems((prev) => [
+      ...prev,
+      { productName: "", quantity: "", price: "" },
+    ])
   }
 
   const removeFormItem = (index: number) => {
@@ -214,10 +181,10 @@ export default function AdminOrderManagement() {
   const updateFormItem = (
     index: number,
     field: keyof FormItem,
-    value: string,
+    value: string
   ) => {
     setFormItems((prev) =>
-      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item)),
+      prev.map((item, i) => (i === index ? { ...item, [field]: value } : item))
     )
   }
 
@@ -391,7 +358,7 @@ export default function AdminOrderManagement() {
                   {orders.map((order) => (
                     <tr key={order.id} className="border-b last:border-b-0">
                       <td className="p-2">
-                        <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary ring-1 ring-inset ring-primary/20">
+                        <span className="inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary ring-1 ring-primary/20 ring-inset">
                           {order.id}
                         </span>
                       </td>
