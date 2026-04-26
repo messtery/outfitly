@@ -7,20 +7,21 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { Field, FieldDescription } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export default function RegisterForm() {
   return (
-    <Card className="w-full max-w-sm">
-      <CardHeader>
-        <CardTitle>Register your account</CardTitle>
-        <CardDescription>
-          Enter your account detail to register your account
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
-        <form>
+    <form action={'#'} method="POST" className="w-full max-w-sm">
+      <Card className="w-full">
+        <CardHeader>
+          <CardTitle>Register your account</CardTitle>
+          <CardDescription>
+            Enter your account detail to register your account
+          </CardDescription>
+        </CardHeader>
+        <CardContent>
           <div className="flex flex-col gap-6">
             <div className="grid gap-2">
               <Label htmlFor="email">Email</Label>
@@ -44,13 +45,16 @@ export default function RegisterForm() {
               <Input id="password-confirmation" type="password" required />
             </div>
           </div>
-        </form>
-      </CardContent>
-      <CardFooter className="flex-col gap-2">
-        <Button type="submit" className="w-full hover:cursor-pointer">
-          Register
-        </Button>
-      </CardFooter>
-    </Card>
+        </CardContent>
+        <CardFooter className="flex-col gap-2">
+          <Button type="submit" className="w-full hover:cursor-pointer">
+            Register
+          </Button>
+          <FieldDescription className="px-6 text-center">
+            <span>Already have an account? <a href="/login" className="underline">Sign in</a></span>
+          </FieldDescription>
+        </CardFooter>
+      </Card>
+    </form>
   )
 }
