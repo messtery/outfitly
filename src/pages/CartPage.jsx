@@ -4,7 +4,7 @@ import CustomerBottomNav from "../components/CustomerBottomNav"
 
 export default function CartPage() {
     return (
-        <div className="min-h-screen pb-20 pt-14 p-6 bg-gray-50">
+        <div className="min-h-screen pb-20 pt-14 p-6">
             <CustomerTopBar title="Cart" />
             <Cart />
             <CustomerBottomNav />

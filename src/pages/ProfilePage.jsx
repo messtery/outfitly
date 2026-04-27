@@ -22,7 +22,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 pb-20 pt-14">
+    <div className="min-h-screen pb-20 pt-14">
       <CustomerTopBar title="Profile" />
 
       <div className="max-w-lg mx-auto p-4 space-y-6">

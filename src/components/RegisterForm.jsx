@@ -7,13 +7,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
-import { Field, FieldDescription } from "@/components/ui/field"
+import { FieldDescription } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 
 export default function RegisterForm() {
   return (
-    <form action={'#'} method="POST" className="w-full max-w-sm">
+    <form action={'login'} method="GET" className="w-full max-w-sm">
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Register your account</CardTitle>
@@ -51,7 +51,7 @@ export default function RegisterForm() {
             Register
           </Button>
           <FieldDescription className="px-6 text-center">
-            <span>Already have an account? <a href="/login" className="underline">Sign in</a></span>
+            <span>Already have an account? <a href="/login" className="underline">Login</a></span>
           </FieldDescription>
         </CardFooter>
       </Card>
