@@ -7,9 +7,9 @@ import { useNavigate } from "react-router-dom"
 
 export default function Cart({}) {
   const initialCart = [
-    { id: 1, name: "Nasi Goreng", category: "Makanan", price: 15000, qty: 1, image: "/images/nasi-goreng.jpg" },
-    { id: 2, name: "Es Teh", category: "Minuman", price: 5000, qty: 2, image: "/images/es-teh.jpg" },
-    { id: 3, name: "Ayam Geprek", category: "Makanan", price: 18000, qty: 1, image: "/images/ayam-geprek.jpg" },
+    { id: 1, name: "Nasi Goreng", category: "Makanan", price: 15000, qty: 1, image: "https://avatar.vercel.sh/shadcn1" },
+    { id: 2, name: "Es Teh", category: "Minuman", price: 5000, qty: 2, image: "https://avatar.vercel.sh/shadcn1" },
+    { id: 3, name: "Ayam Geprek", category: "Makanan", price: 18000, qty: 1, image: "https://avatar.vercel.sh/shadcn1" },
   ]
 
   const [cart, setCart] = useState(initialCart)

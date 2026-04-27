@@ -12,15 +12,15 @@ export default function CustomerBottomNav() {
   const location = useLocation()
 
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white border-t flex justify-around items-center h-16 shadow-md">
+    <nav className="fixed bottom-0 left-0 right-0 z-50 border-t flex justify-around items-center h-16 shadow-md bg-white dark:bg-black">
       {navItems.map(({ label, icon: Icon, path }) => {
         const isActive = location.pathname === path
         return (
           <button
             key={path}
             onClick={() => navigate(path)}
-            className={`flex flex-col items-center gap-1 px-4 py-2 text-xs font-medium transition-colors ${
-              isActive ? "text-black" : "text-gray-400 hover:text-gray-600"
+            className={`flex flex-col items-center gap-1 px-4 py-2 text-xs font-medium transition-colors hover:cursor-pointer ${
+              isActive ? "text-grey" : "text-gray-400 hover:text-gray-600"
             }`}
             aria-current={isActive ? "page" : undefined}
           >
