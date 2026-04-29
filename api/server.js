@@ -1,10 +1,11 @@
 import express from 'express';
 import customerRoutes from './routes/customerRoutes.js';
-import db from './db.js';
+import Product from './models/product.js';
+import Order from './models/order.js';
+import OrderItem from './models/orderitem.js';
 
 const app = express();
 const port = 3000;
-app.use(express.json());
 
 app.use(express.json());
 app.use('/customers', customerRoutes);
@@ -96,6 +97,78 @@ app.delete('/products/:id', async (req, res) => {
         return res.status(500).json({ message: error.message });
     }
 });
+
+app.get('/orders', async (req, res) => {
+    try {
+        const orders = await Order.findAll();
+
+        res.send({
+            data: orders,
+        })
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        
+        res.status(500).json({
+            message: 'Something went wrong',
+        })
+    }
+})
+
+app.get('/orders/:id', async (req, res) => {
+    try {
+        const order = await Order.findByPk(req.params.id);
+
+        res.send({
+            data: order,
+        })
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        
+        res.status(500).json({
+            message: 'Something went wrong',
+        })
+    }
+})
+
+app.post('/orders', async (req, res) => {
+    try {
+        const { customerId, items } = req.body
+
+        console.log({
+            customerId,
+            items,
+        });
+
+        const order = await Order.create({
+            customerId,
+            total: items.reduce((sum, item) => sum + item.price * item.quantity, 0),
+            paymentStatus: 'pending',
+            items: items.map(item => ({
+                productId: item.id,
+                qty: item.qty,
+                price: item.price,
+            }))
+        }, {
+            include: [
+                {
+                    model: OrderItem,
+                    as: 'items',
+                }
+            ]
+        })
+
+        res.status(201).send({
+            message: 'Order created successfully',
+            data: order,
+        })
+    } catch (error) {
+        console.error('Error fetching orders:', error);
+        
+        res.status(500).json({
+            message: 'Something went wrong',
+        })
+    }
+})
 
 app.listen(port, () => {
     console.log(`Server is running on http://localhost:${port}`);
