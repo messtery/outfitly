@@ -7,6 +7,7 @@ import CheckoutPage from './pages/CheckoutPage.jsx';
 import OrderTracking from './pages/OrderTrackingPage.jsx'
 import OrderHistory from './pages/OrderHistoryPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx';
+import AdminLoginPage from "./pages/AdminLoginPage"
 import AdminProductManagement from "./pages/AdminProductManagement"
 import AdminOrderManagement from "./pages/AdminOrderManagement"
 import AdminOrderDetail from "./pages/AdminOrderDetail"
@@ -27,6 +28,7 @@ function App() {
         <Route path="/ordertracking" element={<OrderTracking />} />
         <Route path="/orderhistory" element={<OrderHistory />} />
         <Route path="/profile" element={<ProfilePage />} />
+        <Route path="/admin/login" element={<AdminLoginPage />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/products" element={<AdminProductManagement />} />
         <Route path="/admin/orders" element={<AdminOrderManagement />} />
