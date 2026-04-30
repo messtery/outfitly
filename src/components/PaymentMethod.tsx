@@ -1,7 +1,6 @@
 import { useState } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
-import { Button } from "@/components/ui/button"
 
 const dummyMethods = [
     { id: 1, code: "gopay", name: "GoPay" },
@@ -24,7 +23,12 @@ export default function PaymentMethod() {
                 ))}
             </RadioGroup>
             <div className="flex justify-center">
-                <Button>Pay Now</Button>
+                <button
+                    disabled={!selected}
+                    className="px-4 py-2 bg-white text-black rounded "
+                >
+                    Bayar
+                </button>
             </div>
         </div>
     )
