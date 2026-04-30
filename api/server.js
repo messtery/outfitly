@@ -1,25 +1,20 @@
 import express from 'express';
-import Product from './models/product.js';
+import customerRoutes from './routes/customerRoutes.js';
+import db from './db.js';
 
 const app = express();
 const port = 3000;
 app.use(express.json());
 
-app.get('/', async (req, res) => {
-    try {
-        const products = await Product.findAll();
+app.use(express.json());
+app.use('/api/customers', customerRoutes);
 
-        res.send({
-            data: products,
-        });
-    } catch (error) {
-        console.error('Error fetching products:', error);
-
-        res.status(500).json({
-            message: 'An error occurred while fetching products.',
-        });
-    }
-})
+app.get('/', (req, res) => {
+  res.json({
+    status: 200,
+    message: 'API is running',
+  });
+});
 
 //Product Routes
 app.post('/products', async (req, res) => {
