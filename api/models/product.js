@@ -24,8 +24,8 @@ const Product = sequelize.define('products', {
     field: 'categoryId',
   },
 }, {
-  sequelize,
-  modelName: 'Product',
+  tableName: 'products',
+  timestamps: false,
 });
 
 export default Product;
