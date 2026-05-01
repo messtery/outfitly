@@ -14,7 +14,6 @@ export const create = async (req, res) => {
 
     res.status(500).json({
       message: 'Failed to create customer',
-      error: error.message,
     });
   }
 };
@@ -47,7 +46,6 @@ export const findAll = async (req, res) => {
 
     res.status(500).json({
       message: 'Error fetching customers',
-      error: error.message,
     });
   }
 };
@@ -70,7 +68,6 @@ export const findOne = async (req, res) => {
 
     res.status(500).json({
       message: 'Error fetching customer',
-      error: error.message,
     });
   }
 };
@@ -92,7 +89,6 @@ export const update = async (req, res) => {
   } catch (error) {
     res.status(500).json({
       message: 'Failed to update customer',
-      error: error.message,
     });
   }
 };
@@ -115,7 +111,6 @@ export const remove = async (req, res) => {
 
     res.status(500).json({
       message: 'Error deleting customer',
-      error: error.message,
     });
   }
 };
