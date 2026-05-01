@@ -6,11 +6,6 @@ export const create = async (req, res) => {
   try {
     const { customerId, items } = req.body
 
-    console.log({
-      customerId,
-      items,
-    });
-
     const order = await Order.create({
       customerId,
       total: items.reduce((sum, item) => sum + item.price * item.qty, 0),
@@ -38,7 +33,6 @@ export const create = async (req, res) => {
 
     res.status(500).json({
       message: 'Failed to create order',
-      error: error.message,
     });
   }
 };
@@ -58,7 +52,6 @@ export const findAll = async (req, res) => {
     });
 
     res.status(200).json({
-      message: 'Success',
       data: result.rows,
       meta: {
         total: result.count,
@@ -71,7 +64,6 @@ export const findAll = async (req, res) => {
 
     res.status(500).json({
       message: 'Error fetching orders',
-      error: error.message,
     });
   }
 };
@@ -86,7 +78,6 @@ export const findOne = async (req, res) => {
       });
     }
     res.status(200).json({
-      message: 'Success',
       data: order,
     });
   } catch (error) {
@@ -94,7 +85,6 @@ export const findOne = async (req, res) => {
 
     res.status(500).json({
       message: 'Error fetching order',
-      error: error.message,
     });
   }
 };
@@ -104,7 +94,7 @@ export const update = async (req, res) => {
     const order = await Order.findByPk(req.params.id);
 
     if (!order) {
-      return res.status(404).json({ error: 'Order not found.' });
+      return res.status(404).json({ message: 'Order not found.' });
     }
 
     const { customerId, paymentStatus, items } = req.body;
@@ -139,7 +129,6 @@ export const update = async (req, res) => {
     
     res.status(500).json({
       message: 'Failed to update order',
-      error: error.message,
     });
   }
 };
@@ -149,7 +138,7 @@ export const remove = async (req, res) => {
       const order = await Order.findByPk(req.params.id);
 
       if (!order) {
-          return res.status(404).json({ error: 'Order not found.' });
+          return res.status(404).json({ message: 'Order not found.' });
       }
 
       await order.destroy();
@@ -159,6 +148,8 @@ export const remove = async (req, res) => {
       });
   } catch (error) {
       console.error('Error deleting order:', error);
-      res.status(500).json({ error: 'An error occurred while deleting the order.' });
+      res.status(500).json({
+        message: 'An error occurred while deleting the order.'
+      });
   }
 };
