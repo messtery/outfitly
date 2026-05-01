@@ -1,10 +1,30 @@
 import Category from "../models/category.js";
+import { Op } from "sequelize";
 
-// 1. GET ALL: Ambil semua kategori
+// GET ALL dengan filter q, page, limit
 export const getAllCategories = async (req, res) => {
   try {
-    const categories = await Category.findAll();
-    res.status(200).json(categories);
+    const { q, page = 1, limit = 10 } = req.query;
+
+    const offset = (page - 1) * limit;
+
+    const whereClause = q
+      ? { name: { [Op.like]: `%${q}%` } }
+      : {};
+
+    const { rows, count } = await Category.findAndCountAll({
+      where: whereClause,
+      offset: parseInt(offset),
+      limit: parseInt(limit),
+      order: [["id", "ASC"]],
+    });
+
+    res.status(200).json({
+      totalData: count,
+      totalPages: Math.ceil(count / limit),
+      currentPage: parseInt(page),
+      data: rows,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
