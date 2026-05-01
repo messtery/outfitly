@@ -1,6 +1,7 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom"
 import LoginPage from "./pages/LoginPage"
 import Register from "./pages/Register.jsx"
+import ForgotPasswordPage from "./pages/ForgotPasswordPage.jsx"
 import Menu from "./pages/Menu.jsx"
 import CartPage from './pages/CartPage.jsx';
 import CheckoutPage from './pages/CheckoutPage.jsx';
@@ -21,6 +22,7 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPasswordPage />} />
         <Route path="/menu" element={<Menu />} />
         <Route path="/cart" element={<CartPage />} />
         <Route path="/checkout" element={<CheckoutPage />} />
@@ -33,6 +35,7 @@ function App() {
         <Route path="/admin/orders/:id" element={<AdminOrderDetail />} />
         <Route path="/admin/categories" element={<AdminCategoryManagement />} />
         <Route path="/admin/customers" element={<AdminCustomerList />} />
+        
       </Routes>
     </BrowserRouter>
   )
