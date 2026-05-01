@@ -8,6 +8,10 @@ const app = express();
 const port = 3000;
 
 app.use(express.json());
+app.use((req, res, next) => {
+  res.setHeader('Content-Type', 'application/json');
+  next();
+});
 app.use('/customers', customerRoutes);
 app.use('/orders', orderRoutes);
 app.use('/orders/:orderId/items', orderItemRoutes);
