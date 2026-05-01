@@ -3,18 +3,21 @@ import customerRoutes from './routes/customerRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import orderItemRoutes from './routes/orderItemRoutes.js';
 import Product from './models/product.js';
+import categoryRoutes from './routes/categoryRoutes.js';
 
 const app = express();
-const port = 3000;
+const PORT = 5000;
 
 app.use(express.json());
 app.use((req, res, next) => {
   res.setHeader('Content-Type', 'application/json');
   next();
 });
+
 app.use('/customers', customerRoutes);
 app.use('/orders', orderRoutes);
 app.use('/orders/:orderId/items', orderItemRoutes);
+app.use('/api', categoryRoutes);
 
 app.get('/', (req, res) => {
   res.json({
