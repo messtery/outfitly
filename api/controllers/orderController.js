@@ -24,7 +24,7 @@ export const create = async (req, res) => {
       ]
     })
 
-    res.status(201).send({
+    res.status(201).json({
       message: 'Order created successfully',
       data: order,
     })
