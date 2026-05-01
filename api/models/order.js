@@ -20,6 +20,7 @@ const Order = sequelize.define('orders', {
     onDelete: 'CASCADE'
   },
   total: {
+    allowNull: false,
     type: DataTypes.INTEGER
   },
   paymentStatus: {
@@ -38,6 +39,7 @@ const Order = sequelize.define('orders', {
 }, {
   sequelize,
   modelName: 'Order',
+  timestamps: true,
 });
 
 Order.hasMany(OrderItem, {
