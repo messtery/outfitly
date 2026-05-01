@@ -1,6 +1,7 @@
 import express from 'express';
 import customerRoutes from './routes/customerRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
+import orderItemRoutes from './routes/orderItemRoutes.js';
 import Product from './models/product.js';
 
 const app = express();
@@ -9,6 +10,7 @@ const port = 3000;
 app.use(express.json());
 app.use('/customers', customerRoutes);
 app.use('/orders', orderRoutes);
+app.use('/orders/:orderId/items', orderItemRoutes);
 
 app.get('/', (req, res) => {
   res.json({

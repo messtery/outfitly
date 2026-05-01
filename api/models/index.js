@@ -6,6 +6,8 @@ import { Sequelize } from 'sequelize';
 import Customer from './customer.js';
 import Product from './product.js';
 import Category from './category.js';
+import OrderItem from './orderitem.js';
+import Order from './order.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -32,6 +34,11 @@ Object.keys(db).forEach(modelName => {
   if (db[modelName]?.associate) {
     db[modelName].associate(db);
   }
+});
+
+OrderItem.belongsTo(Order, {
+  foreignKey: 'orderId',
+  as: 'order',
 });
 
 export default db;
