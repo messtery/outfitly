@@ -1,5 +1,6 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../db.js";
+import Order from "./order.js";
 
 const OrderItem = sequelize.define('order_items',{
   id: {
@@ -47,6 +48,7 @@ const OrderItem = sequelize.define('order_items',{
 }, {
   sequelize,
   modelName: 'OrderItem',
+  timestamps: true,
 });
 
 export default OrderItem;
