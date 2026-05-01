@@ -4,14 +4,15 @@ import Customer from '../models/customer.js';
 export const create = async (req, res) => {
   try {
     const customer = await Customer.create(req.body);
+
     res.status(201).json({
-      status: 201,
       message: 'Customer created',
       data: customer,
     });
   } catch (error) {
-    res.status(400).json({
-      status: 400,
+    console.error(error);
+
+    res.status(500).json({
       message: 'Failed to create customer',
       error: error.message,
     });
@@ -33,7 +34,6 @@ export const findAll = async (req, res) => {
     });
 
     res.status(200).json({
-      status: 200,
       message: 'Success',
       data: result.rows,
       meta: {
@@ -43,8 +43,9 @@ export const findAll = async (req, res) => {
       },
     });
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
-      status: 500,
       message: 'Error fetching customers',
       error: error.message,
     });
@@ -61,13 +62,13 @@ export const findOne = async (req, res) => {
       });
     }
     res.status(200).json({
-      status: 200,
       message: 'Success',
       data: customer,
     });
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
-      status: 500,
       message: 'Error fetching customer',
       error: error.message,
     });
@@ -85,13 +86,11 @@ export const update = async (req, res) => {
     }
     await customer.update(req.body);
     res.status(200).json({
-      status: 200,
       message: 'Customer updated',
       data: customer,
     });
   } catch (error) {
-    res.status(400).json({
-      status: 400,
+    res.status(500).json({
       message: 'Failed to update customer',
       error: error.message,
     });
@@ -109,12 +108,12 @@ export const remove = async (req, res) => {
     }
     await customer.destroy();
     res.status(200).json({
-      status: 200,
       message: 'Customer deleted',
     });
   } catch (error) {
+    console.error(error);
+
     res.status(500).json({
-      status: 500,
       message: 'Error deleting customer',
       error: error.message,
     });

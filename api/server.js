@@ -7,7 +7,7 @@ const port = 3000;
 app.use(express.json());
 
 app.use(express.json());
-app.use('/api/customers', customerRoutes);
+app.use('/customers', customerRoutes);
 
 app.get('/', (req, res) => {
   res.json({
