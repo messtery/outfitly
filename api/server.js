@@ -27,7 +27,7 @@ app.post('/products', async (req, res) => {
         const product = await Product.create(req.body);
 
         return res.status(201).json({
-            message: `Product dengan berhasil ditambahkan`,
+            message: `Product created successfully`,
             data: product
         });
     } catch (error) {
@@ -53,11 +53,11 @@ app.get('/products/:id', async (req, res) => {
         const product = await Product.findByPk(req.params.id);
 
         if (!product) {
-            return res.status(404).json({ message: "Product tidak ditemukan" });
+            return res.status(404).json({ message: "Product not found" });
         }
 
         return res.status(200).json({
-            message: `Product dengan id ${req.params.id} berhasil diambil`,
+            message: `Product with id ${req.params.id} fetched successfully`,
             data: product
         });
     } catch (error) {
@@ -70,7 +70,7 @@ app.patch('/products/:id', async (req, res) => {
         const product = await Product.findByPk(req.params.id);
 
         if (!product) {
-            return res.status(404).json({ message: "Product tidak ditemukan" });
+            return res.status(404).json({ message: "Product not found" });
         }
 
         await product.update(req.body);
@@ -89,13 +89,13 @@ app.delete('/products/:id', async (req, res) => {
         const product = await Product.findByPk(req.params.id);
 
         if (!product) {
-            return res.status(404).json({ message: "Product tidak ditemukan" });
+            return res.status(404).json({ message: "Product not found" });
         }
 
         await product.destroy();
 
         return res.status(200).json({
-            message: `Product dengan id ${req.params.id} berhasil dihapus`
+            message: `Product with id ${req.params.id} deleted successfully`
         });
     } catch (error) {
         return res.status(500).json({ message: error.message });
