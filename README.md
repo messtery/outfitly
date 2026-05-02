@@ -31,6 +31,14 @@
 - 241111802 - Gylbert Mars Antonius
 - 241110625 - Frederiko
 
+## Project Setup
+1. Clone this repo
+2. Rename `api/.env.example` to `api/.env`
+3. Setup your database configuration
+4. Run `npm i`
+5. Run `npx sequelize:cli db:migrate`
+6. Done
+
 ---
 
 ## API Schema
