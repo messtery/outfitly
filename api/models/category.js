@@ -26,6 +26,7 @@ const Category = sequelize.define('categories', {
 }, {
   sequelize,
   modelName: 'Category',
+  timestamps: true,
 })
 
 export default Category
