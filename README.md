@@ -485,3 +485,91 @@ Response (404)
   "message": "Customer not found"
 }
 ```
+---
+
+```json
+/* 1. Create Category
+  POST /categories
+*/
+// Request Body:
+{
+  "name": "Makanan Penutup (Dessert)"
+}
+
+// Response (201):
+{
+  "id": 1,
+  "name": "Makanan Penutup (Dessert)",
+  "createdAt": "2026-05-02T00:00:00.000Z",
+  "updatedAt": "2026-05-02T00:00:00.000Z"
+}
+
+
+/* 2. Get All Categories
+  GET /categories
+  Query Params: ?q=name&page=1&limit=10
+*/
+// Response (200):
+{
+  "totalData": 1,
+  "totalPages": 1,
+  "currentPage": 1,
+  "data": [
+    {
+      "id": 1,
+      "name": "Makanan Penutup (Dessert)",
+      "createdAt": "2026-05-02T00:00:00.000Z",
+      "updatedAt": "2026-05-02T00:00:00.000Z"
+    }
+  ]
+}
+
+
+/* 3. Get Category By ID
+  GET /categories/:id
+*/
+// Response (200):
+{
+  "id": 1,
+  "name": "Makanan Penutup (Dessert)",
+  "createdAt": "2026-05-02T00:00:00.000Z",
+  "updatedAt": "2026-05-02T00:00:00.000Z"
+}
+
+// Response (404):
+{
+  "message": "Kategori tidak ditemukan"
+}
+
+
+/* 4. Update Category
+  PATCH /categories/:id
+*/
+// Request Body:
+{
+  "name": "Dessert & Appetizer"
+}
+
+// Response (200):
+{
+  "message": "Kategori berhasil diupdate",
+  "data": {
+    "id": 1,
+    "name": "Dessert & Appetizer",
+    "updatedAt": "2026-05-02T00:00:00.000Z"
+  }
+}
+
+
+/* 5. Delete Category
+  DELETE /categories/:id
+*/
+// Response (200):
+{
+  "message": "Kategori berhasil dihapus"
+}
+
+// Response (500):
+{
+  "message": "Internal Server Error"
+}
