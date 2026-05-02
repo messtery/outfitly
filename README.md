@@ -37,7 +37,8 @@
 3. Setup your database configuration
 4. Run `npm i`
 5. Run `npx sequelize:cli db:migrate`
-6. Done
+6. Run `npx run api-dev`
+7. Done
 
 ---
 
