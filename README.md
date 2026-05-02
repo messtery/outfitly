@@ -337,3 +337,151 @@ Response (404)
   "message": "Product not found."
 }
 ```
+
+---
+
+1. Create Customers
+
+POST /customers
+
+Request Body
+```json
+{
+  "name": "Budi",
+  "phone": "08222",
+  "email": "budi234@gmail.com",
+  "address": "Surabaya"
+},
+
+```
+Response (201)
+```json
+{
+  "status": 201,
+  "message": "Customer created",
+  "data": {
+    "id": 1,
+    "name": "Budi",
+    "phone": "08222",
+    "email": "budi234@gmail.com",
+    "address": "Surabaya",
+    "updatedAt": "2026-05-02T04:20:38.095Z",
+    "createdAt": "2026-05-02T04:20:38.095Z"
+  }
+}
+```
+2. Get All Customers
+
+GET /customers
+
+Query Params
+q (optional): search by customers name
+page (optional): default 1
+limit (optional): default 10
+Example
+/customers?q=Budi&page=1&limit=10
+Response (200)
+```json
+{
+  "status": 200,
+  "message": "Success",
+  "data": [
+    {
+      "id": 1,
+      "name": "Budi",
+      "email": "budi234@gmail.com",
+      "phone": 8222,
+      "address": "Surabaya",
+      "createdAt": "2026-05-02T04:20:38.000Z",
+      "updatedAt": "2026-05-02T04:20:38.000Z"
+    }
+  ],
+  "meta": {
+    "total": 1,
+    "page": 1,
+    "limit": 10
+  }
+}
+```
+3. Get Customers By ID
+
+GET /customers/:id
+
+Response (200)
+```json
+{
+  "status": 200,
+  "message": "Success",
+  "data": {
+    "id": 1,
+    "name": "Budi",
+    "email": "budi234@gmail.com",
+    "phone": 8222,
+    "address": "Surabaya",
+    "createdAt": "2026-05-02T04:20:38.000Z",
+    "updatedAt": "2026-05-02T04:20:38.000Z"
+  }
+}
+```
+Response (404)
+```json
+{
+  "status": 404,
+  "message": "Customer not found"
+}
+```
+
+4. Update Customers
+
+PUT /customers/:id
+
+Request Body
+```json
+{
+  "name": "BudiUp",
+  "phone": "08222",
+  "email": "budi234@gmail.com",
+  "address": "Surabaya"
+}
+```
+Response (200)
+```json
+{
+  "status": 200,
+  "message": "Customer updated",
+  "data": {
+    "id": 1,
+    "name": "BudiUp",
+    "email": "budi234@gmail.com",
+    "phone": "08222",
+    "address": "Surabaya",
+    "createdAt": "2026-05-02T04:20:38.000Z",
+    "updatedAt": "2026-05-02T04:25:53.834Z"
+  }
+}
+```
+Response (404)
+```json
+{
+  "status": 404,
+  "message": "Customer not found"
+}
+```
+5. Delete Customers
+
+DELETE /customers/:id
+
+Response (200)
+```json
+{
+  "status": 200,
+  "message": "Customer deleted"
+}
+```
+Response (404)
+```json
+{
+  "status": 404,
+  "message": "Customer not found"
+}
+```
