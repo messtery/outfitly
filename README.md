@@ -210,3 +210,130 @@ Response (404)
   "message": "Order not found."
 }
 ```
+1. Create Product
+
+POST /products
+
+Request Body
+```json
+
+{
+  "name": "Burger Spesial",
+  "price": 20000,
+  "description": "Burger dengan daging premium",
+  "categoryId": 2
+}
+```
+Response (201)
+```json
+{
+  "message": "Product created successfully",
+  "data": {
+    "id": 1,
+    "name": "Burger Spesial",
+    "price": 20000,
+    "description": "Burger dengan daging premium",
+    "categoryId": 2
+  }
+}
+```
+
+2. Get All Products
+
+GET /products
+
+Query Params
+q (optional): search by product name
+categoryId (optional): filter by category
+minPrice / maxPrice (optional): filter by price range
+page (optional): default 1
+limit (optional): default 10
+Example
+/products?q=burger&categoryId=2&page=1&limit=5
+Response(200)
+```json
+{
+  "message": "Products fetched successfully",
+  "totalItems": 1,
+  "totalPages": 1,
+  "currentPage": 1,
+  "data": [
+    {
+      "id": 1,
+      "name": "Burger Spesial",
+      "price": 20000,
+      "description": "Burger dengan daging premium",
+      "categoryId": 2
+    }
+  ]
+}
+```
+
+3. Get Product By ID
+
+GET /products/:id
+
+Response (200)
+```json
+{
+  "id": 1,
+  "name": "Burger Spesial",
+  "price": 20000,
+  "description": "Burger dengan daging premium",
+  "categoryId": 2
+}
+```
+Response (404)
+```json
+{
+  "message": "Product not found"
+}
+```
+
+4. Update Product
+
+PATCH /products/:id
+
+Request Body
+```json
+{
+  "price": 25000,
+  "description": "Burger dengan daging premium dan ekstra keju"
+}
+```
+Response (200)
+```json
+{
+  "message": "Product updated successfully",
+  "data": {
+    "id": 1,
+    "name": "Burger Spesial",
+    "price": 25000,
+    "description": "Burger dengan daging premium dan ekstra keju",
+    "categoryId": 2
+  }
+}
+```
+Response(404)
+```json
+{
+  "message": "Product not found"
+}
+```
+
+5. Delete Product
+
+DELETE /products/:id
+
+Response (200)
+```json
+{
+  "message": "Product with id 1 deleted successfully."
+}
+```
+Response (404)
+```json
+{
+  "message": "Product not found."
+}
+```
