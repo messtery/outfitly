@@ -1,6 +1,10 @@
 import { useState, useRef, useEffect } from "react"
 import { Bot, X, Send } from "lucide-react"
 
+const FAB_POSITION = "bottom-20 right-4"
+
+let nextId = 2
+
 export default function AIChatFAB() {
   const [isOpen, setIsOpen] = useState(false)
   const [message, setMessage] = useState("")
@@ -18,7 +22,7 @@ export default function AIChatFAB() {
   const handleSend = () => {
     const trimmed = message.trim()
     if (!trimmed) return
-    setMessages((prev) => [...prev, { id: Date.now(), role: "user", text: trimmed }])
+    setMessages((prev) => [...prev, { id: nextId++, role: "user", text: trimmed }])
     setMessage("")
   }
 
@@ -33,7 +37,7 @@ export default function AIChatFAB() {
     <>
       {/* Chat panel */}
       {isOpen && (
-        <div className="fixed bottom-20 right-4 z-50 w-80 rounded-2xl shadow-2xl border bg-white dark:bg-black flex flex-col overflow-hidden">
+        <div className={`fixed ${FAB_POSITION} z-50 w-80 rounded-2xl shadow-2xl border bg-white dark:bg-black flex flex-col overflow-hidden`}>
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-violet-500 to-blue-500">
             <div className="flex items-center gap-2 text-white">
@@ -95,7 +99,7 @@ export default function AIChatFAB() {
       {/* FAB */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className="fixed bottom-20 right-4 z-50 w-14 h-14 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white shadow-lg flex items-center justify-center hover:cursor-pointer hover:scale-105 active:scale-95 transition-transform"
+        className={`fixed ${FAB_POSITION} z-50 w-14 h-14 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white shadow-lg flex items-center justify-center hover:cursor-pointer hover:scale-105 active:scale-95 transition-transform`}
         aria-label="Open AI chat"
       >
         <Bot className="w-6 h-6" />
