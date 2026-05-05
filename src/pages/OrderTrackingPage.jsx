@@ -2,6 +2,7 @@ import OrderTimeline from "@/components/order/OrderTimeline"
 import OrderDetails from "@/components/order/OrderDetails"
 import OrderActions from "@/components/order/OrderActions"
 import OrderEstimate from "@/components/order/OrderEstimate"
+import AIChatFAB from "@/components/AIChatFAB"
 
 export default function OrderTrackingPage() {
   const order = {
@@ -22,6 +23,7 @@ export default function OrderTrackingPage() {
         onCancel={() => console.log("Pesanan dibatalkan")}
         onRepeat={() => console.log("Repeat order")}
       />
+      <AIChatFAB />
     </div>
   )
 }

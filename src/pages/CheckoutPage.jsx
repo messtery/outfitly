@@ -1,5 +1,6 @@
 import Checkout from "../components/Checkout"
 import PaymentMethod from "../components/PaymentMethod"
+import AIChatFAB from "../components/AIChatFAB"
 
 export default function CheckoutPage() {
     return (
@@ -9,6 +10,7 @@ export default function CheckoutPage() {
                 <Checkout/>
                 <PaymentMethod />
             </div>
+            <AIChatFAB />
         </div>
     )
 }

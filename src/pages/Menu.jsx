@@ -1,6 +1,7 @@
 import MenuList from "../components/MenuList";
 import CustomerTopBar from "../components/CustomerTopBar";
 import CustomerBottomNav from "../components/CustomerBottomNav";
+import AIChatFAB from "../components/AIChatFAB";
 
 export default function Menu() {
   return (
@@ -8,6 +9,7 @@ export default function Menu() {
       <CustomerTopBar title="Menu"/>
       <MenuList />
       <CustomerBottomNav />
+      <AIChatFAB />
     </div>
   );
 }
