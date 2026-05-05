@@ -1,6 +1,5 @@
-import Product from '../models/Product.js';
+import Product from '../models/product.js';
 import { Op } from "sequelize";
-
 
 export const createProduct = async (req, res) => {
   try {
