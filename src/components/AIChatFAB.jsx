@@ -13,6 +13,22 @@ export default function AIChatFAB() {
   ])
   const messagesEndRef = useRef(null)
 
+  const createChat = (message) => {
+    fetch(`http://localhost:3000/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: res.data.reason }])
+      })
+  }
+  
   useEffect(() => {
     if (isOpen && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
@@ -24,6 +40,7 @@ export default function AIChatFAB() {
     if (!trimmed) return
     setMessages((prev) => [...prev, { id: nextId++, role: "user", text: trimmed }])
     setMessage("")
+    createChat(trimmed)
   }
 
   const handleKeyDown = (e) => {
@@ -57,7 +74,6 @@ export default function AIChatFAB() {
           <div className="flex-1 overflow-y-auto p-3 space-y-3 max-h-72">
             {messages.map((msg) => (
               <div
-                key={msg.id}
                 className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
               >
                 <div

@@ -1,4 +1,4 @@
-import { useRef, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { Button } from "@/components/ui/button"
 import {
   Card,
@@ -14,34 +14,103 @@ import AdminSidebar from "@/components/AdminSidebar"
 type Product = {
   id: number
   name: string
-  category: string
+  categoryId: number
   price: number
+  description?: string
 }
 
-const initialProducts: Product[] = [
-  { id: 1, name: "Nasi Goreng", category: "Food", price: 15000 },
-  { id: 2, name: "Es Teh", category: "Drink", price: 5000 },
-]
+// const initialProducts: Product[] = [
+//   { id: 1, name: "Nasi Goreng", category: "Food", price: 15000 },
+//   { id: 2, name: "Es Teh", category: "Drink", price: 5000 },
+// ]
 const categoryOptions = ["Food", "Drink"] as const
 const selectFieldClassName =
   "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80"
 
 export default function AdminProductManagement() {
-  const [products, setProducts] = useState<Product[]>(initialProducts)
-  const nextProductId = useRef(
-    initialProducts.length
-      ? Math.max(...initialProducts.map((product) => product.id)) + 1
-      : 1
-  )
+  const [categories, setCategories] = useState([])
+  const [products, setProducts] = useState<Product[]>([])
   const [name, setName] = useState("")
-  const [category, setCategory] = useState("")
+  const [categoryId, setCategoryId] = useState(0)
   const [price, setPrice] = useState("")
+  const [description, setDescription] = useState("")
   const [editingProductId, setEditingProductId] = useState<number | null>(null)
   const [errorMessage, setErrorMessage] = useState("")
 
+  const fetchCategories = () => {
+    fetch('http://localhost:3000/api/categories')
+      .then((res) => res.json())
+      .then((res) => {
+        setCategories(res.data)
+      })
+  }
+
+  const fetchProducts = () => {
+    fetch('http://localhost:3000/products')
+      .then((res) => res.json())
+      .then((res) => {
+        setProducts(res.data)
+      })
+  }
+
+  const createProduct = () => {
+    fetch('http://localhost:3000/products', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        categoryId,
+        price: Number(price),
+        description,
+      }),
+    })
+      .then((res) => res.json())
+      .then(() => {
+        fetchProducts()
+        resetForm()
+      })
+  }
+
+  const editProduct = (id: number) => {
+    fetch(`http://localhost:3000/products/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        name,
+        categoryId,
+        price: Number(price),
+        description,
+      }),
+    })
+      .then((res) => res.json())
+      .then(() => {
+        fetchProducts()
+        resetForm()
+      })
+  }
+
+  const deleteProduct = (id: number) => {
+    fetch(`http://localhost:3000/products/${id}`, {
+      method: 'DELETE',
+    })
+      .then((res) => res.json())
+      .then(() => {
+        fetchProducts()
+      })
+  }
+
+  useEffect(() => {
+    fetchCategories()
+    fetchProducts()
+  }, [])
+
   const resetForm = () => {
     setName("")
-    setCategory("")
+    setCategoryId(0)
     setPrice("")
     setEditingProductId(null)
     setErrorMessage("")
@@ -53,7 +122,7 @@ export default function AdminProductManagement() {
 
     if (
       !name.trim() ||
-      !category.trim() ||
+      categoryId === null ||
       Number.isNaN(parsedPrice) ||
       parsedPrice <= 0
     ) {
@@ -61,39 +130,48 @@ export default function AdminProductManagement() {
       return
     }
 
-    if (editingProductId === null) {
-      setProducts((prev) => [
-        ...prev,
-        {
-          id: nextProductId.current,
-          name: name.trim(),
-          category: category.trim(),
-          price: parsedPrice,
-        },
-      ])
-      nextProductId.current += 1
-      resetForm()
+    // if (editingProductId === null) {
+    //   setProducts((prev) => [
+    //     ...prev,
+    //     {
+    //       id: nextProductId.current,
+    //       name: name.trim(),
+    //       category: category.trim(),
+    //       price: parsedPrice,
+    //     },
+    //   ])
+    //   nextProductId.current += 1
+    //   resetForm()
+    //   return
+    // }
+
+    // setProducts((prev) =>
+    //   console.log(prev)
+      
+    //   // prev.map((product) =>
+    //   //   product.id === editingProductId
+    //   //     ? {
+    //   //         ...product,
+    //   //         name: name.trim(),
+    //   //         category: category.trim(),
+    //   //         price: parsedPrice,
+    //   //       }
+    //   //     : product
+    //   // )
+    // )
+    if (editingProductId) {
+      editProduct(editingProductId)
+      console.log(editingProductId);
+      
       return
     }
-
-    setProducts((prev) =>
-      prev.map((product) =>
-        product.id === editingProductId
-          ? {
-              ...product,
-              name: name.trim(),
-              category: category.trim(),
-              price: parsedPrice,
-            }
-          : product
-      )
-    )
-    resetForm()
+    
+    createProduct()
   }
 
   const handleEdit = (product: Product) => {
     setName(product.name)
-    setCategory(product.category)
+    setCategoryId(product.categoryId)
     setPrice(String(product.price))
     setEditingProductId(product.id)
   }
@@ -103,6 +181,7 @@ export default function AdminProductManagement() {
     if (editingProductId === id) {
       resetForm()
     }
+    deleteProduct(id)
   }
 
   return (
@@ -139,13 +218,13 @@ export default function AdminProductManagement() {
                     id="product-category"
                     aria-label="Product category"
                     className={selectFieldClassName}
-                    value={category}
-                    onChange={(event) => setCategory(event.target.value)}
+                    value={categoryId}
+                    onChange={(event) => setCategoryId(event.target.value)}
                   >
                     <option value="">Select category</option>
-                    {categoryOptions.map((option) => (
-                      <option key={option} value={option}>
-                        {option}
+                    {categories.map((category) => (
+                      <option key={category.id} value={category.id}>
+                        {category.name}
                       </option>
                     ))}
                   </select>
@@ -160,6 +239,17 @@ export default function AdminProductManagement() {
                     min="1"
                     value={price}
                     onChange={(event) => setPrice(event.target.value)}
+                  />
+                </div>
+                <div className="grid gap-2">
+                  <Label htmlFor="product-description">Description</Label>
+                  <Input
+                    id="product-description"
+                    aria-label="Product description"
+                    placeholder="Description"
+                    type="text"
+                    value={description}
+                    onChange={(event) => setDescription(event.target.value)}
                   />
                 </div>
                 <div className="flex items-end gap-2">
@@ -193,6 +283,7 @@ export default function AdminProductManagement() {
                     <th className="p-2 font-medium">Name</th>
                     <th className="p-2 font-medium">Category</th>
                     <th className="p-2 font-medium">Price</th>
+                    <th className="p-2 font-medium">Description</th>
                     <th className="p-2 font-medium">Actions</th>
                   </tr>
                 </thead>
@@ -205,6 +296,7 @@ export default function AdminProductManagement() {
                       <td className="p-2">
                         Rp {product.price.toLocaleString("id-ID")}
                       </td>
+                      <td className="p-2">{product.description}</td>
                       <td className="p-2">
                         <div className="flex gap-2">
                           <Button
