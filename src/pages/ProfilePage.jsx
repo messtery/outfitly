@@ -1,5 +1,6 @@
 import CustomerTopBar from "../components/CustomerTopBar"
 import CustomerBottomNav from "../components/CustomerBottomNav"
+import AIChatFAB from "../components/AIChatFAB"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { useNavigate } from "react-router-dom"
@@ -85,6 +86,7 @@ export default function ProfilePage() {
       </div>
 
       <CustomerBottomNav />
+      <AIChatFAB />
     </div>
   )
 }

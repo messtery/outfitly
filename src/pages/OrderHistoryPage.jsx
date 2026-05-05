@@ -1,4 +1,5 @@
 import OrderHistory from "@/components/order/OrderHistory"
+import AIChatFAB from "@/components/AIChatFAB"
 
 export default function OrderHistoryPage() {
   const orders = [
@@ -25,6 +26,7 @@ export default function OrderHistoryPage() {
   return (
     <div className="max-w-md mx-auto p-4">
       <OrderHistory orders={orders} />
+      <AIChatFAB />
     </div>
   )
 }
