@@ -2,7 +2,6 @@ import express from 'express';
 import customerRoutes from './routes/customerRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import orderItemRoutes from './routes/orderItemRoutes.js';
-import Product from './models/product.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';

@@ -24,6 +24,24 @@ export default function MenuList() {
       })
   }
 
+  const handleAddToCart = (productId) => {
+    fetch('http://localhost:3000/orders', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        customerId: 1,
+        productId,
+        qty: 1,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        alert('Added to cart')
+      })
+  }
+
   useEffect(() => {
     fetchProducts()
   }, [])
@@ -64,7 +82,7 @@ export default function MenuList() {
               </CardDescription>
             </CardHeader>
             <CardFooter>
-              <Button className="w-full" onClick={() => alert('item added')}>Add To Cart</Button>
+              <Button className="w-full" onClick={() => handleAddToCart(product.id)}>Add To Cart</Button>
             </CardFooter>
           </Card>
         ))}

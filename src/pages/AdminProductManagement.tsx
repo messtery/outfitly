@@ -16,24 +16,24 @@ type Product = {
   name: string
   categoryId: number
   price: number
-  description?: string
+  description: string | null
 }
 
-// const initialProducts: Product[] = [
-//   { id: 1, name: "Nasi Goreng", category: "Food", price: 15000 },
-//   { id: 2, name: "Es Teh", category: "Drink", price: 5000 },
-// ]
-const categoryOptions = ["Food", "Drink"] as const
+type Category = {
+  id: number
+  name: string
+}
+
 const selectFieldClassName =
   "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80"
 
 export default function AdminProductManagement() {
-  const [categories, setCategories] = useState([])
+  const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [name, setName] = useState("")
   const [categoryId, setCategoryId] = useState(0)
   const [price, setPrice] = useState("")
-  const [description, setDescription] = useState("")
+  const [description, setDescription] = useState<string | null>("")
   const [editingProductId, setEditingProductId] = useState<number | null>(null)
   const [errorMessage, setErrorMessage] = useState("")
 
@@ -130,35 +130,6 @@ export default function AdminProductManagement() {
       return
     }
 
-    // if (editingProductId === null) {
-    //   setProducts((prev) => [
-    //     ...prev,
-    //     {
-    //       id: nextProductId.current,
-    //       name: name.trim(),
-    //       category: category.trim(),
-    //       price: parsedPrice,
-    //     },
-    //   ])
-    //   nextProductId.current += 1
-    //   resetForm()
-    //   return
-    // }
-
-    // setProducts((prev) =>
-    //   console.log(prev)
-      
-    //   // prev.map((product) =>
-    //   //   product.id === editingProductId
-    //   //     ? {
-    //   //         ...product,
-    //   //         name: name.trim(),
-    //   //         category: category.trim(),
-    //   //         price: parsedPrice,
-    //   //       }
-    //   //     : product
-    //   // )
-    // )
     if (editingProductId) {
       editProduct(editingProductId)
       console.log(editingProductId);
@@ -174,6 +145,7 @@ export default function AdminProductManagement() {
     setCategoryId(product.categoryId)
     setPrice(String(product.price))
     setEditingProductId(product.id)
+    setDescription(product.description)
   }
 
   const handleDelete = (id: number) => {
@@ -219,7 +191,7 @@ export default function AdminProductManagement() {
                     aria-label="Product category"
                     className={selectFieldClassName}
                     value={categoryId}
-                    onChange={(event) => setCategoryId(event.target.value)}
+                    onChange={(event) => setCategoryId(parseInt(event.target.value))}
                   >
                     <option value="">Select category</option>
                     {categories.map((category) => (
@@ -248,7 +220,7 @@ export default function AdminProductManagement() {
                     aria-label="Product description"
                     placeholder="Description"
                     type="text"
-                    value={description}
+                    value={description ?? ''}
                     onChange={(event) => setDescription(event.target.value)}
                   />
                 </div>
@@ -292,7 +264,7 @@ export default function AdminProductManagement() {
                     <tr key={product.id} className="border-b last:border-b-0">
                       <td className="p-2">{index + 1}</td>
                       <td className="p-2">{product.name}</td>
-                      <td className="p-2">{product.category}</td>
+                      <td className="p-2">{product.categoryId}</td>
                       <td className="p-2">
                         Rp {product.price.toLocaleString("id-ID")}
                       </td>
