@@ -2,6 +2,7 @@ import { useState } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { useNavigate } from "react-router-dom"
 
 const dummyMethods = [
     { id: 1, code: "gopay", name: "GoPay" },
@@ -11,6 +12,27 @@ const dummyMethods = [
 
 export default function PaymentMethod() {
     const [selected, setSelected] = useState("")
+    const navigate = useNavigate()
+
+    const checkout = () => {
+        fetch('http://localhost:3000/checkout', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                customerId: 1,
+            })
+        })
+            .then((res) => res.json())
+            .then(() => {
+                navigate('/ordertracking')
+            })
+    }
+
+    const handleClick = () => {
+        checkout()
+    }
 
     return (
         <div className="space-y-4 flex-col ">
@@ -24,7 +46,7 @@ export default function PaymentMethod() {
                 ))}
             </RadioGroup>
             <div className="flex justify-center">
-                <Button>Pay Now</Button>
+                <Button onClick={() => handleClick()}>Pay Now</Button>
             </div>
         </div>
     )

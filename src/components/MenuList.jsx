@@ -25,7 +25,7 @@ export default function MenuList() {
   }
 
   const handleAddToCart = (productId) => {
-    fetch('http://localhost:3000/orders', {
+    fetch('http://localhost:3000/cart', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

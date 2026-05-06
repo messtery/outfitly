@@ -1,6 +1,7 @@
 import { Op } from 'sequelize';
 import Order from '../models/order.js';
 import OrderItem from '../models/orderitem.js';
+import Product from '../models/product.js';
 
 export const create = async (req, res) => {
   try {
@@ -49,6 +50,19 @@ export const findAll = async (req, res) => {
       where,
       limit: limitNum,
       offset: (pageNum - 1) * limitNum,
+      attributes: ['id', 'customerId', 'total', 'paymentStatus', 'createdAt'],
+      include: [
+        {
+          model: OrderItem,
+          as: 'items',
+          include: [
+            {
+              model: Product,
+              as: 'product',
+            }
+          ]
+        }
+      ],
     });
 
     res.status(200).json({
