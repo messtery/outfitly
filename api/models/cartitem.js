@@ -1,42 +1,37 @@
-import { DataTypes } from "sequelize";
-import sequelize from "../db.js";
-import Order from "./order.js";
-import Product from "./product.js";
+import { DataTypes } from 'sequelize';
+import sequelize from '../db.js';
+import Product from './product.js';
 
-const OrderItem = sequelize.define('order_items',{
+const CartItem = sequelize.define('cart_items', {
   id: {
     allowNull: false,
     autoIncrement: true,
     primaryKey: true,
     type: DataTypes.INTEGER
   },
-  orderId: {
-    type: DataTypes.INTEGER,
+  cartId: {
     allowNull: false,
+    type: DataTypes.INTEGER,
     references: {
-      model: 'orders',
+      model: 'carts',
       key: 'id',
-    },
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE'
+    }
   },
   productId: {
-    type: DataTypes.INTEGER,
     allowNull: false,
+    type: DataTypes.INTEGER,
     references: {
       model: 'products',
       key: 'id',
-    },
-    onUpdate: 'CASCADE',
-    onDelete: 'CASCADE'
+    }
   },
   qty: {
-    type: DataTypes.INTEGER,
     allowNull: false,
+    type: DataTypes.INTEGER
   },
   price: {
-    type: DataTypes.INTEGER,
     allowNull: false,
+    type: DataTypes.INTEGER
   },
   createdAt: {
     allowNull: false,
@@ -48,13 +43,13 @@ const OrderItem = sequelize.define('order_items',{
   }
 }, {
   sequelize,
-  modelName: 'OrderItem',
+  modelName: 'CartItem',
   timestamps: true,
-});
+})
 
-OrderItem.belongsTo(Product, {
+CartItem.belongsTo(Product, {
   foreignKey: 'productId',
   as: 'product',
 })
 
-export default OrderItem;
+export default CartItem

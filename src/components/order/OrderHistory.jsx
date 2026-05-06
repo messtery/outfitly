@@ -11,11 +11,11 @@ export default function OrderHistory({ orders, onRepeat }) {
         <Card key={order.id} className="p-4 space-y-3">
           <div className="flex justify-between items-center">
             <h3 className="font-semibold">Order #{order.id}</h3>
-            <Badge variant="outline">{order.status}</Badge>
+            <Badge variant="outline">{order.paymentStatus}</Badge>
           </div>
 
           <p className="text-sm text-muted-foreground">
-            {new Date(order.date).toLocaleString()}
+            {new Date(order.createdAt).toLocaleString()}
           </p>
 
           <div className="space-y-2">

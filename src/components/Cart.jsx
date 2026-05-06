@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { Card, CardHeader, CardContent, CardFooter } from "./ui/card"
 import { Button } from "./ui/button"
 import { Input } from "./ui/input"
@@ -6,25 +6,60 @@ import { Table, TableHeader, TableRow, TableCell, TableBody } from "./ui/table"
 import { useNavigate } from "react-router-dom"
 
 export default function Cart({}) {
-  const initialCart = [
-    { id: 1, name: "Nasi Goreng", category: "Makanan", price: 15000, qty: 1, image: "https://avatar.vercel.sh/shadcn1" },
-    { id: 2, name: "Es Teh", category: "Minuman", price: 5000, qty: 2, image: "https://avatar.vercel.sh/shadcn1" },
-    { id: 3, name: "Ayam Geprek", category: "Makanan", price: 18000, qty: 1, image: "https://avatar.vercel.sh/shadcn1" },
-  ]
-
-  const [cart, setCart] = useState(initialCart)
+  const [cartItems, setCartItems] = useState([])
+  const [total, setTotal] = useState(0)
+  
   const navigate = useNavigate()
 
-  const updateQty = (id, newQty) => {
-    setCart(prev =>
-      prev.map(item =>
-        item.id === id ? { ...item, qty: newQty } : item
-      )
-    )
+  const handleQtyUpdate = (id, qty) => {
+    setCartItems((prevItems) => prevItems.map((item) => item.id === id ? { ...item, qty } : item))
+    updateCartItem(id, qty)
   }
 
-  const subtotal = cart.reduce((acc, item) => acc + item.price * item.qty, 0)
-  const total = subtotal
+  const handleRemove = (id) => {
+    deleteCartItem(id)
+  }
+
+  const fetchCartItems = () => {
+    fetch('http://localhost:3000/cart-items?customerId=1')
+      .then((res) => res.json())
+      .then((res) => {
+        setCartItems(res.data)
+        setTotal(res.data.reduce((sum, item) => sum + (item.price * item.qty), 0))
+      })
+  }
+
+  const updateCartItem = (id, qty) => {
+    fetch('http://localhost:3000/cart-items', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        customerId: 1,
+        id,
+        qty,
+      })
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        fetchCartItems()
+      })
+  }
+
+  const deleteCartItem = (id) => {
+    fetch(`http://localhost:3000/cart-items/${id}`, {
+      method: 'DELETE',
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        fetchCartItems()
+      })
+  }
+
+  useEffect(() => {
+    fetchCartItems()
+  }, [])
 
   return (
     <Card className="max-w-2xl mx-auto mt-10">
@@ -41,35 +76,34 @@ export default function Cart({}) {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {cart.map(item => (
-              <TableRow key={item.id}>
+            {cartItems.map((cartItem) => (
+              <TableRow key={cartItem.id}>
                 <TableCell className="flex items-center gap-3">
-                  <img src={item.image} alt={item.name} className="w-12 h-12 rounded-md object-cover" />
+                  <img src={cartItem.image ?? null} alt={cartItem.product.name} className="w-12 h-12 rounded-md object-cover" />
                   <div>
-                    <span className="block">{item.name}</span>
-                    <span className="text-xs text-gray-400">{item.category}</span>
+                    <span className="block">{cartItem.product.name}</span>
+                    <span className="text-xs text-gray-400">{cartItem.categoryId}</span>
                   </div>
                 </TableCell>
                 <TableCell>
                   <Input
                     type="number"
                     min="1"
-                    value={item.qty}
-                    onChange={(e) => updateQty(item.id, parseInt(e.target.value))}
+                    value={cartItem.qty}
+                    onChange={(e) => handleQtyUpdate(cartItem.id, e.target.value)}
                     className="w-16 text-center"
                   />
                 </TableCell>
-                <TableCell>Rp {item.price * item.qty}</TableCell>
+                <TableCell className="text-right">Rp {cartItem.price * cartItem.qty}</TableCell>
+                <TableCell className="text-right">
+                  <Button className="bg-red-500 text-white" onClick={() => handleRemove(cartItem.id)}>Remove</Button>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
         </Table>
 
         <div className="mt-6 space-y-2">
-          <div className="flex justify-between">
-            <span>Subtotal</span>
-            <span>Rp {subtotal}</span>
-          </div>
           <div className="flex justify-between font-bold text-lg">
             <span>Total</span>
             <span>Rp {total}</span>

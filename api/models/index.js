@@ -8,6 +8,8 @@ import Product from './product.js';
 import Category from './category.js';
 import OrderItem from './orderitem.js';
 import Order from './order.js';
+import Cart from './cart.js';
+import CartItem from './cartitem.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -40,5 +42,15 @@ OrderItem.belongsTo(Order, {
   foreignKey: 'orderId',
   as: 'order',
 });
+
+CartItem.belongsTo(Product, {
+  foreignKey: 'productId',
+  as: 'product',
+})
+
+CartItem.belongsTo(Cart, {
+  foreignKey: 'cartId',
+  as: 'cart',
+})
 
 export default db;

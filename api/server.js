@@ -5,6 +5,13 @@ import orderItemRoutes from './routes/orderItemRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import {checkout} from './controllers/checkoutController.js';
+import {
+  get as getCartItems,
+  create as createCart,
+  update as updateCartItem,
+  remove as removeCartItem,
+} from './controllers/cartItemController.js'
 import cors from 'cors';
 
 const app = express();
@@ -25,6 +32,13 @@ app.use('/orders/:orderId/items', orderItemRoutes);
 app.use('/api', categoryRoutes);
 app.use('/products', productRoutes);
 app.use('/chat', chatRoutes);
+
+app.get('/cart-items', getCartItems);
+app.post('/cart', createCart);
+app.put('/cart-items', updateCartItem);
+app.delete('/cart-items/:id', removeCartItem);
+
+app.post('/checkout', checkout)
 
 app.get('/', (req, res) => {
   res.json({
