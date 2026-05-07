@@ -5,10 +5,11 @@ import { Input } from "./ui/input"
 import { Table, TableHeader, TableRow, TableCell, TableBody } from "./ui/table"
 import { useNavigate } from "react-router-dom"
 
-export default function Cart({}) {
+export default function Cart() {
   const [cartItems, setCartItems] = useState([])
   const [total, setTotal] = useState(0)
-  
+  const [loading, setLoading] = useState(true)
+
   const navigate = useNavigate()
 
   const handleQtyUpdate = (id, qty) => {
@@ -26,6 +27,9 @@ export default function Cart({}) {
       .then((res) => {
         setCartItems(res.data)
         setTotal(res.data.reduce((sum, item) => sum + (item.price * item.qty), 0))
+      })
+      .finally(() => {
+        setLoading(false)
       })
   }
 
@@ -47,8 +51,8 @@ export default function Cart({}) {
       })
   }
 
-  const deleteCartItem = (id) => {
-    fetch(`http://localhost:3000/cart-items/${id}`, {
+  const deleteCartItem = async (id) => {
+    await fetch(`http://localhost:3000/cart-items/${id}`, {
       method: 'DELETE',
     })
       .then((res) => res.json())
@@ -60,6 +64,26 @@ export default function Cart({}) {
   useEffect(() => {
     fetchCartItems()
   }, [])
+
+  if (loading) {
+    return (
+      <>
+        <div className="w-full h-screen flex items-center justify-center">
+          <h1 className="text-2xl font-bold">Loading...</h1>
+        </div>
+      </>
+    )
+  }
+
+  if (! cartItems.length) {
+    return (
+      <>
+        <div className="w-full h-screen flex items-center justify-center">
+          <h1 className="text-2xl font-bold">No data</h1>
+        </div>
+      </>
+    )
+  }
 
   return (
     <Card className="max-w-2xl mx-auto mt-10">
@@ -79,7 +103,7 @@ export default function Cart({}) {
             {cartItems.map((cartItem) => (
               <TableRow key={cartItem.id}>
                 <TableCell className="flex items-center gap-3">
-                  <img src={cartItem.image ?? null} alt={cartItem.product.name} className="w-12 h-12 rounded-md object-cover" />
+                  <img src={"https://avatar.vercel.sh/shadcn1"} alt={cartItem.product.name} className="w-12 h-12 rounded-md object-cover grayscale" />
                   <div>
                     <span className="block">{cartItem.product.name}</span>
                     <span className="text-xs text-gray-400">{cartItem.categoryId}</span>
