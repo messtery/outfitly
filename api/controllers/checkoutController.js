@@ -36,7 +36,11 @@ export const checkout = async (req, res) => {
       ]
     })
 
-    cart.delete()
+    await Cart.destroy({
+      where: {
+        id: cart.id,
+      }
+    })
 
     res.status(201).json({
       data: order,

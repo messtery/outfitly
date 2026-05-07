@@ -4,6 +4,16 @@ import AIChatFAB from "../components/AIChatFAB"
 import { Button } from "../components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "../components/ui/card"
 import { useNavigate } from "react-router-dom"
+import { UtensilsCrossed, ChevronRightIcon } from "lucide-react"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item"
+
 
 const mockUser = {
   username: "alice_johnson",
@@ -19,7 +29,7 @@ export default function ProfilePage() {
   const navigate = useNavigate()
 
   const handleLogout = () => {
-    navigate("/register")
+    navigate("/login")
   }
 
   return (
@@ -46,32 +56,22 @@ export default function ProfilePage() {
         {/* Order history */}
         <Card>
           <CardHeader>
-            <CardTitle>Order History</CardTitle>
+            <CardTitle>Activity</CardTitle>
           </CardHeader>
           <CardContent className="space-y-3">
-            {mockOrderHistory.map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center justify-between rounded-lg border p-3 text-sm"
-              >
-                <div>
-                  <p className="font-medium">{order.id}</p>
-                  <p className="text-gray-500">{order.date}</p>
-                </div>
-                <div className="text-right">
-                  <p className="font-semibold">Rp {order.total.toLocaleString()}</p>
-                  <span
-                    className={`text-xs font-medium px-2 py-0.5 rounded-full ${
-                      order.status === "Delivered"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-yellow-100 text-yellow-700"
-                    }`}
-                  >
-                    {order.status}
-                  </span>
-                </div>
-              </div>
-            ))}
+            <Item variant="outline" size="sm" asChild>
+              <a href="/orderhistory">
+                <ItemMedia>
+                  <UtensilsCrossed className="size-5" />
+                </ItemMedia>
+                <ItemContent>
+                  <ItemTitle>Your Orders</ItemTitle>
+                </ItemContent>
+                <ItemActions>
+                  <ChevronRightIcon className="size-4" />
+                </ItemActions>
+              </a>
+            </Item>
           </CardContent>
         </Card>
 

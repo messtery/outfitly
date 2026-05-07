@@ -15,12 +15,16 @@ export default function MenuList() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [products, setProducts] = useState([]);
+  const [loading, setLoading] = useState(true);
 
   const fetchProducts = () => {
     fetch('http://localhost:3000/products')
       .then((res) => res.json())
       .then((res) => {
         setProducts(res.data)
+      })
+      .finally(() => {
+        setLoading(false)
       })
   }
 
@@ -45,6 +49,26 @@ export default function MenuList() {
   useEffect(() => {
     fetchProducts()
   }, [])
+
+  if (loading) {
+    return (
+      <>
+        <div className="w-full h-screen flex items-center justify-center">
+          <h1 className="text-2xl font-bold">Loading...</h1>
+        </div>
+      </>
+    )
+  }
+
+  if (! products.length) {
+    return (
+      <>
+        <div className="w-full h-screen flex items-center justify-center">
+          <h1 className="text-2xl font-bold">No data</h1>
+        </div>
+      </>
+    )
+  }
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
@@ -76,7 +100,7 @@ export default function MenuList() {
               </CardAction>
               <CardTitle>{product.name}</CardTitle>
               <CardDescription title={product.description}>
-                <p class="line-clamp-2">
+                <p className="line-clamp-2">
                   {product.description}
                 </p>
               </CardDescription>

@@ -43,6 +43,13 @@ export const get = async (req, res) => {
       },
     });
 
+    if (!cart) {
+      return res.status(404).json({
+        status: 404,
+        message: 'Cart not found',
+      });
+    }
+
     const cartItems = await CartItem.findAll({
       where: {
         cartId: cart.id,
@@ -54,13 +61,6 @@ export const get = async (req, res) => {
         }
       ]
     })
-
-    if (!cart) {
-      return res.status(404).json({
-        status: 404,
-        message: 'Cart not found',
-      });
-    }
 
     res.status(200).json({
       data: cartItems,
