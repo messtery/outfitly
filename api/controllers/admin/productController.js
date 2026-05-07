@@ -1,5 +1,4 @@
-import Category from '../models/category.js';
-import Product from '../models/product.js';
+import Product from '../../models/product.js';
 import { Op } from "sequelize";
 
 export const createProduct = async (req, res) => {
@@ -38,13 +37,6 @@ export const getProducts = async (req, res) => {
             limit: parseInt(limit),
             offset: parseInt(offset),
             attributes: ['id', 'name', 'price', 'description', 'categoryId'],
-            include: [
-              {
-                model: Category,
-                as: 'category',
-                attributes: ['id', 'name'],
-              }
-            ],
         });
 
         return res.status(200).json({

@@ -1,6 +1,7 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../db.js";
 import OrderItem from "./orderitem.js";
+import Customer from "./customer.js";
 
 const Order = sequelize.define('orders', {
   id: {
@@ -45,6 +46,11 @@ const Order = sequelize.define('orders', {
 Order.hasMany(OrderItem, {
   foreignKey: 'orderId',
   as: 'items',
+})
+
+Order.belongsTo(Customer, {
+  foreignKey: 'customerId',
+  as: 'customer',
 })
 
 export default Order;

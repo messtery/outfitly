@@ -4,7 +4,8 @@ import Product from '../models/product.js';
 
 export const create = async (req, res) => {
   try {
-    const { customerId, productId, qty } = req.body
+    const customerId = req.user.id
+    const { productId, qty } = req.body
     const [cart] = await Cart.findOrCreate({
       where: {
         customerId,
@@ -35,7 +36,7 @@ export const create = async (req, res) => {
 
 export const get = async (req, res) => {
   try {
-    const customerId = req.query.customerId
+    const customerId = req.user.id
 
     const cart = await Cart.findOne({
       where: {

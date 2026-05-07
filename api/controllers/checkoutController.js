@@ -5,7 +5,7 @@ import OrderItem from '../models/orderitem.js';
 
 export const checkout = async (req, res) => {
   try {
-    const { customerId } = req.body
+    const customerId = req.user.id
     const cart = await Cart.findOne({
       where: {
         customerId,

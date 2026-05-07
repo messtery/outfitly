@@ -1,7 +1,8 @@
 import { Op } from 'sequelize';
-import Order from '../models/order.js';
-import OrderItem from '../models/orderitem.js';
-import Product from '../models/product.js';
+import Order from '../../models/order.js';
+import OrderItem from '../../models/orderitem.js';
+import Product from '../../models/product.js';
+import Customer from '../../models/customer.js';
 
 export const create = async (req, res) => {
   try {
@@ -40,7 +41,6 @@ export const create = async (req, res) => {
 
 export const findAll = async (req, res) => {
   try {
-    const customerId = req.user.id
     const { q, page, limit } = req.query;
     const pageNum = parseInt(page) || 1;
     const limitNum = parseInt(limit) || 10;
@@ -48,9 +48,7 @@ export const findAll = async (req, res) => {
     const where = q ? { id: { [Op.like]: `%${q}%` } } : {};
 
     const result = await Order.findAndCountAll({
-      where: {
-        customerId,
-      },
+      where,
       limit: limitNum,
       offset: (pageNum - 1) * limitNum,
       attributes: ['id', 'customerId', 'total', 'paymentStatus', 'createdAt'],
@@ -63,7 +61,12 @@ export const findAll = async (req, res) => {
               model: Product,
               as: 'product',
             }
-          ]
+          ],
+        },
+        {
+          model: Customer,
+          as: 'customer',
+          attributes: ['id', 'name', 'email'],
         }
       ],
     });

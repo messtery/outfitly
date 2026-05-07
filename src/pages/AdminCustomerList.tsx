@@ -1,20 +1,24 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import AdminSidebar from "@/components/AdminSidebar"
+import { useEffect, useState } from "react"
 
 type Customer = {
   id: number
   email: string
-  totalOrders: number
+  name: string
 }
 
-const initialCustomers: Customer[] = [
-  { id: 1, email: "alice.johnson@example.com", totalOrders: 3 },
-  { id: 2, email: "bob.smith@example.com", totalOrders: 1 },
-  { id: 3, email: "carol.white@example.com", totalOrders: 2 },
-  { id: 4, email: "david.brown@example.com", totalOrders: 1 },
-]
-
 export default function AdminCustomerList() {
+  const [customers, setCustomers] = useState<Customer[]>([])
+
+  useEffect(() => {
+    fetch("http://localhost:3000/admin/customers")
+      .then((res) => res.json())
+      .then((res) => {
+        setCustomers(res.data)
+      })
+  }, [])
+  
   return (
     <div className="mx-auto max-w-6xl p-6">
       <div className="grid gap-6 md:grid-cols-[240px_1fr]">
@@ -31,15 +35,15 @@ export default function AdminCustomerList() {
                   <tr className="border-b text-left">
                     <th className="p-2 font-medium">#</th>
                     <th className="p-2 font-medium">Email</th>
-                    <th className="p-2 font-medium">Total Orders</th>
+                    <th className="p-2 font-medium">Name</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {initialCustomers.map((customer) => (
+                  {customers.map((customer) => (
                     <tr key={customer.id} className="border-b last:border-b-0">
                       <td className="p-2">{customer.id}</td>
                       <td className="p-2">{customer.email}</td>
-                      <td className="p-2">{customer.totalOrders}</td>
+                      <td className="p-2">{customer.name}</td>
                     </tr>
                   ))}
                 </tbody>

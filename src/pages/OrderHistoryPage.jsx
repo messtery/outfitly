@@ -7,7 +7,11 @@ export default function OrderHistoryPage() {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const res = await fetch('http://localhost:3000/orders?customerId=1');
+      const res = await fetch('http://localhost:3000/orders', {
+        headers: {
+          'Authorization': `Bearer ${localStorage.token}`,
+        },
+      });
       const json = await res.json();
   
       setOrders(json.data);

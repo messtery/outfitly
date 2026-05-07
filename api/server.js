@@ -1,10 +1,12 @@
 import express from 'express';
+import authMiddleware from './middlewares/authMiddleware.js';
 import customerRoutes from './routes/customerRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import orderItemRoutes from './routes/orderItemRoutes.js';
 import categoryRoutes from './routes/categoryRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
+import adminRoutes from './routes/adminRoutes.js';
 import {checkout} from './controllers/checkoutController.js';
 import {
   get as getCartItems,
@@ -12,6 +14,10 @@ import {
   update as updateCartItem,
   remove as removeCartItem,
 } from './controllers/cartItemController.js'
+import {
+  login,
+  register,
+} from './controllers/authController.js'
 import cors from 'cors';
 
 const app = express();
@@ -26,6 +32,11 @@ app.use((req, res, next) => {
   next();
 });
 
+app.use('/admin', adminRoutes)
+
+app.post('/auth/login', login)
+app.post('/auth/register', register)
+
 app.use('/customers', customerRoutes);
 app.use('/orders', orderRoutes);
 app.use('/orders/:orderId/items', orderItemRoutes);
@@ -33,12 +44,12 @@ app.use('/api', categoryRoutes);
 app.use('/products', productRoutes);
 app.use('/chat', chatRoutes);
 
-app.get('/cart-items', getCartItems);
-app.post('/cart', createCart);
-app.put('/cart-items', updateCartItem);
-app.delete('/cart-items/:id', removeCartItem);
+app.get('/cart-items', authMiddleware, getCartItems);
+app.post('/cart-items', authMiddleware, createCart);
+app.put('/cart-items', authMiddleware, updateCartItem);
+app.delete('/cart-items/:id', authMiddleware, removeCartItem);
 
-app.post('/checkout', checkout)
+app.post('/checkout', authMiddleware, checkout)
 
 app.get('/', (req, res) => {
   res.json({

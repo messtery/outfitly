@@ -11,17 +11,18 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import AdminSidebar from "@/components/AdminSidebar"
 
+type Category = {
+  id: number
+  name: string
+}
+
 type Product = {
   id: number
   name: string
   categoryId: number
   price: number
   description: string | null
-}
-
-type Category = {
-  id: number
-  name: string
+  category: Category
 }
 
 const selectFieldClassName =
@@ -46,7 +47,7 @@ export default function AdminProductManagement() {
   }
 
   const fetchProducts = () => {
-    fetch('http://localhost:3000/products')
+    fetch('http://localhost:3000/products?limit=100')
       .then((res) => res.json())
       .then((res) => {
         setProducts(res.data)
@@ -264,7 +265,7 @@ export default function AdminProductManagement() {
                     <tr key={product.id} className="border-b last:border-b-0">
                       <td className="p-2">{index + 1}</td>
                       <td className="p-2">{product.name}</td>
-                      <td className="p-2">{product.categoryId}</td>
+                      <td className="p-2">{product.category.name}</td>
                       <td className="p-2">
                         Rp {product.price.toLocaleString("id-ID")}
                       </td>
