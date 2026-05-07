@@ -19,14 +19,12 @@ export default function PaymentMethod() {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'Authorization': `Bearer ${localStorage.token}`,
             },
-            body: JSON.stringify({
-                customerId: 1,
-            })
         })
             .then((res) => res.json())
-            .then(() => {
-                navigate('/ordertracking')
+            .then((res) => {
+                navigate(`/ordertracking/${res.data.id}`)
             })
     }
 

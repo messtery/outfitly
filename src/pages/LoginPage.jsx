@@ -11,10 +11,42 @@ import {
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { FieldDescription } from "@/components/ui/field"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function LoginPage() {
+	const [email, setEmail] = useState("")
+	const [password, setPassword] = useState("")
+
+	const navigate = useNavigate()
+
+	const handleSubmit = (e) => {
+		e.preventDefault()
+
+		fetch('http://localhost:3000/auth/login', {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify({
+				email,
+				password,
+			}),
+		})
+			.then((res) => res.json())
+			.then((res) => {
+				localStorage.setItem('token', res.token)
+				localStorage.setItem('customer', JSON.stringify(res.customer))
+
+				navigate('/menu')
+			})
+			.catch((err) => {
+				alert('Login failed')
+			})
+	}
+	
 	return (
-		<form method="get" action={'/menu'} className="flex items-center justify-center min-h-screen">
+		<form onSubmit={handleSubmit} className="flex items-center justify-center min-h-screen">
 			<Card className="w-full max-w-sm">
 				<CardHeader>
 					<CardTitle>Login to your account</CardTitle>
@@ -30,6 +62,8 @@ export default function LoginPage() {
 								id="email"
 								type="email"
 								placeholder="m@example.com"
+								value={email}
+								onChange={(e) => setEmail(e.target.value)}
 								required
 							/>
 						</div>
@@ -43,7 +77,13 @@ export default function LoginPage() {
 									Forgot your password?
 								</a>
 							</div>
-							<Input id="password" type="password" required />
+							<Input
+								id="password"
+								type="password"
+								value={password}
+								onChange={(e) => setPassword(e.target.value)}
+								required
+							/>
 						</div>
 					</div>
 				</CardContent>

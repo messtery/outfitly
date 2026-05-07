@@ -29,8 +29,13 @@ export default function ProfilePage() {
   const navigate = useNavigate()
 
   const handleLogout = () => {
+    localStorage.removeItem("token")
+    localStorage.removeItem("customer")
+    
     navigate("/login")
   }
+
+  const { name, email } = JSON.parse(localStorage.customer)
 
   return (
     <div className="min-h-screen pb-20 pt-14">
@@ -47,8 +52,8 @@ export default function ProfilePage() {
               {mockUser.username.charAt(0)}
             </div>
             <div>
-              <p className="text-sm text-gray-500">Username</p>
-              <p className="font-semibold text-lg">{mockUser.username}</p>
+              <p className="text-sm text-gray-500">{name}</p>
+              <p className="font-semibold text-lg">{email}</p>
             </div>
           </CardContent>
         </Card>

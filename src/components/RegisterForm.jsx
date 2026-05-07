@@ -10,10 +10,42 @@ import {
 import { FieldDescription } from "@/components/ui/field"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
 
 export default function RegisterForm() {
+  const [email, setEmail] = useState("")
+  const [name, setName] = useState("")
+  const [password, setPassword] = useState("")
+
+  const navigate = useNavigate()
+  
+  const register = () => {
+    fetch('http://localhost:3000/auth/register', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        email,
+        name,
+        password,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        navigate('/login')
+      })
+  }
+  
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    register()
+  }
+  
   return (
-    <form action={'login'} method="GET" className="w-full max-w-sm">
+    <form action={'#'} method="POST" className="w-full max-w-sm" onSubmit={handleSubmit}>
       <Card className="w-full">
         <CardHeader>
           <CardTitle>Register your account</CardTitle>
@@ -29,6 +61,21 @@ export default function RegisterForm() {
                 id="email"
                 type="email"
                 placeholder="john@example.com"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+            <div className="grid gap-2">
+              <div className="flex items-center">
+                <Label htmlFor="name">Name</Label>
+              </div>
+              <Input
+                id="name"
+                type="text"
+                placeholder="John Doe"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
                 required
               />
             </div>
@@ -36,7 +83,13 @@ export default function RegisterForm() {
               <div className="flex items-center">
                 <Label htmlFor="password">Password</Label>
               </div>
-              <Input id="password" type="password" required />
+              <Input
+                id="password"
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                required
+              />
             </div>
             <div className="grid gap-2">
               <div className="flex items-center">

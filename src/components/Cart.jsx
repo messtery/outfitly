@@ -22,7 +22,11 @@ export default function Cart() {
   }
 
   const fetchCartItems = () => {
-    fetch('http://localhost:3000/cart-items?customerId=1')
+    fetch('http://localhost:3000/cart-items', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.token}`,
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         setCartItems(res.data)
@@ -38,6 +42,7 @@ export default function Cart() {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.token}`,
       },
       body: JSON.stringify({
         customerId: 1,
@@ -53,6 +58,9 @@ export default function Cart() {
 
   const deleteCartItem = async (id) => {
     await fetch(`http://localhost:3000/cart-items/${id}`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.token}`,
+      },
       method: 'DELETE',
     })
       .then((res) => res.json())
@@ -75,7 +83,7 @@ export default function Cart() {
     )
   }
 
-  if (! cartItems.length) {
+  if (! cartItems || ! cartItems.length) {
     return (
       <>
         <div className="w-full h-screen flex items-center justify-center">

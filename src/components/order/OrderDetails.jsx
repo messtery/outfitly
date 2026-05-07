@@ -7,7 +7,7 @@ export default function OrderDetails({ items }) {
       <ul className="text-sm list-disc list-inside">
         {items.map((item, idx) => (
           <li key={idx}>
-            {item.name} x {item.qty}
+            {item.qty} {item.product.name}
           </li>
         ))}
       </ul>

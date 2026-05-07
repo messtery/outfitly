@@ -6,7 +6,11 @@ export default function Checkout() {
   const [total, setTotal] = useState(0)
   
   const fetchCartItems = () => {
-    fetch('http://localhost:3000/cart-items?customerId=1')
+    fetch('http://localhost:3000/cart-items?customerId=1', {
+      headers: {
+        'Authorization': `Bearer ${localStorage.token}`,
+      },
+    })
       .then((res) => res.json())
       .then((res) => {
         setCartItems(res.data)

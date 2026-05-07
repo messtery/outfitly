@@ -13,6 +13,7 @@ import AdminOrderDetail from "./pages/AdminOrderDetail"
 import AdminCategoryManagement from "./pages/AdminCategoryManagement"
 import AdminDashboard from "./pages/AdminDashboard"
 import AdminCustomerList from './pages/AdminCustomerList';
+import ProtectedLayout from "./middlewares/ProtectedLayout.jsx"
 
 function App() {
   return (
@@ -21,11 +22,15 @@ function App() {
         <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/register" element={<Register />} />
-        <Route path="/menu" element={<Menu />} />
-        <Route path="/cart" element={<CartPage />} />
-        <Route path="/checkout" element={<CheckoutPage />} />
-        <Route path="/ordertracking" element={<OrderTracking />} />
-        <Route path="/orderhistory" element={<OrderHistory />} />
+
+        <Route element={<ProtectedLayout />}>
+          <Route path="/menu" element={<Menu />} />
+          <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/ordertracking/:id" element={<OrderTracking />} />
+          <Route path="/orderhistory" element={<OrderHistory />} />
+        </Route>
+
         <Route path="/profile" element={<ProfilePage />} />
         <Route path="/admin/dashboard" element={<AdminDashboard />} />
         <Route path="/admin/products" element={<AdminProductManagement />} />

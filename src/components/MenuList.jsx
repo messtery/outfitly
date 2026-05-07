@@ -29,13 +29,13 @@ export default function MenuList() {
   }
 
   const handleAddToCart = (productId) => {
-    fetch('http://localhost:3000/cart', {
+    fetch('http://localhost:3000/cart-items', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${localStorage.token}`,
       },
       body: JSON.stringify({
-        customerId: 1,
         productId,
         qty: 1,
       }),
