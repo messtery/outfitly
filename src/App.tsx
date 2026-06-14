@@ -7,39 +7,56 @@ import CheckoutPage from './pages/CheckoutPage.jsx';
 import OrderTracking from './pages/OrderTrackingPage.jsx'
 import OrderHistory from './pages/OrderHistoryPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx';
-import AdminProductManagement from "./pages/AdminProductManagement"
-import AdminOrderManagement from "./pages/AdminOrderManagement"
-import AdminOrderDetail from "./pages/AdminOrderDetail"
-import AdminCategoryManagement from "./pages/AdminCategoryManagement"
-import AdminDashboard from "./pages/AdminDashboard"
-import AdminCustomerList from './pages/AdminCustomerList';
+import AdminProductManagement from "./pages/admin/ProductPage.js"
+import AdminOrderManagement from "./pages/admin/OrderPage.js"
+import AdminOrderDetail from "./pages/admin/OrderDetailPage.js"
+import AdminCategoryManagement from "./pages/admin/CategoryPage.js"
+import AdminDashboard from "./pages/admin/DashboardPage.js"
+import AdminCustomerList from './pages/admin/CustomerPage.js';
 import ProtectedLayout from "./middlewares/ProtectedLayout.jsx"
+import { TooltipProvider } from "@/components/ui/tooltip"
+import { SidebarProvider, SidebarInset, SidebarTrigger } from "@/components/ui/sidebar"
+import AdminLayout from "./layouts/AdminLayout.js";
+import AdminDashboardPage from "./pages/admin/DashboardPage.js";
+import ProductPage from "./pages/admin/ProductPage.js";
+import DashboardPage from "./pages/admin/DashboardPage.js";
+import CategoryPage from "./pages/admin/CategoryPage.js";
+import OrderDetailPage from "./pages/admin/OrderDetailPage.js";
+import CustomerPage from "./pages/admin/CustomerPage.js";
+import OrderPage from "./pages/admin/OrderPage.js";
 
 function App() {
   return (
-    <BrowserRouter>
-      <Routes>
-        <Route path="/" element={<Navigate to="/login" replace />} />
-        <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<Register />} />
+    <TooltipProvider>
+      <SidebarProvider>
+        <BrowserRouter>
+          <Routes>
+            <Route path="/" element={<Navigate to="/login" replace />} />
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<Register />} />
 
-        <Route element={<ProtectedLayout />}>
-          <Route path="/menu" element={<Menu />} />
-          <Route path="/cart" element={<CartPage />} />
-          <Route path="/checkout" element={<CheckoutPage />} />
-          <Route path="/ordertracking/:id" element={<OrderTracking />} />
-          <Route path="/orderhistory" element={<OrderHistory />} />
-        </Route>
+            <Route element={<ProtectedLayout />}>
+              <Route path="/menu" element={<Menu />} />
+              <Route path="/cart" element={<CartPage />} />
+              <Route path="/checkout" element={<CheckoutPage />} />
+              <Route path="/ordertracking/:id" element={<OrderTracking />} />
+              <Route path="/orderhistory" element={<OrderHistory />} />
+            </Route>
 
-        <Route path="/profile" element={<ProfilePage />} />
-        <Route path="/admin/dashboard" element={<AdminDashboard />} />
-        <Route path="/admin/products" element={<AdminProductManagement />} />
-        <Route path="/admin/orders" element={<AdminOrderManagement />} />
-        <Route path="/admin/orders/:id" element={<AdminOrderDetail />} />
-        <Route path="/admin/categories" element={<AdminCategoryManagement />} />
-        <Route path="/admin/customers" element={<AdminCustomerList />} />
-      </Routes>
-    </BrowserRouter>
+            <Route path="/profile" element={<ProfilePage />} />
+
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route path="/admin/dashboard" element={<DashboardPage />} />
+              <Route path="/admin/products" element={<ProductPage />} />
+              <Route path="/admin/orders" element={<OrderPage />} />
+              <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
+              <Route path="/admin/categories" element={<CategoryPage />} />
+              <Route path="/admin/customers" element={<CustomerPage />} />
+            </Route>
+          </Routes>
+        </BrowserRouter>
+      </SidebarProvider>
+    </TooltipProvider>
   )
 }
 

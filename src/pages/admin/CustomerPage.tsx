@@ -8,7 +8,7 @@ type Customer = {
   name: string
 }
 
-export default function AdminCustomerList() {
+export default function CustomerPage() {
   const [customers, setCustomers] = useState<Customer[]>([])
 
   useEffect(() => {

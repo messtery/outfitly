@@ -9,7 +9,6 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import AdminSidebar from "@/components/AdminSidebar"
 
 type Category = {
   id: number
@@ -28,7 +27,7 @@ type Product = {
 const selectFieldClassName =
   "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80"
 
-export default function AdminProductManagement() {
+export default function ProductPage() {
   const [categories, setCategories] = useState<Category[]>([])
   const [products, setProducts] = useState<Product[]>([])
   const [name, setName] = useState("")
@@ -158,10 +157,8 @@ export default function AdminProductManagement() {
   }
 
   return (
-    <div className="mx-auto max-w-6xl p-6">
-      <div className="grid gap-6 md:grid-cols-[240px_1fr]">
-        <AdminSidebar currentPage="products" />
-
+    <div className="mx-auto p-6">
+      <div className="grid gap-6">
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -173,7 +170,7 @@ export default function AdminProductManagement() {
             <CardContent>
               <form
                 onSubmit={handleSubmit}
-                className="grid gap-4 md:grid-cols-2"
+                className="grid gap-4"
               >
                 <div className="grid gap-2">
                   <Label htmlFor="product-name">Name</Label>
