@@ -1,55 +1,51 @@
 import { useState, useRef, useEffect } from "react"
 import { Bot, X, Send, CirclePlus } from "lucide-react"
-import { Button } from "@/components/ui/button"
-import { ChevronRightIcon } from "lucide-react"
 import {
   Item,
   ItemActions,
   ItemContent,
-  ItemDescription,
-  ItemMedia,
   ItemTitle,
 } from "@/components/ui/item"
+import { cartService } from "../services/CartService"
+import { toast } from "sonner"
+import { useNavigate } from "react-router-dom"
 
 const FAB_POSITION = "bottom-20 right-4"
 
 let nextId = 2
 
+type Message = {
+  id: number
+  role: "user" | "assistant"
+  text: string
+  type?: "text" | "action"
+  itemId?: string
+}
+
 export default function AIChatFAB() {
   const [isOpen, setIsOpen] = useState(false)
   const [message, setMessage] = useState("")
-  const [messages, setMessages] = useState([
-    { id: 1, role: "assistant", text: "Hi! I'm your AI fashion assistant. How can I help you today?" },
+  const [messages, setMessages] = useState<Message[]>([
+    { id: 1, role: "assistant", text: "Hi! I'm your AI assistant. How can I help you today?" },
   ])
   const messagesEndRef = useRef(null)
+  const navigate = useNavigate()
 
-  const createChat = (message) => {
-    // fetch(`http://localhost:3000/chat`, {
-    //   method: 'POST',
-    //   headers: {
-    //     'Content-Type': 'application/json',
-    //   },
-    //   body: JSON.stringify({
-    //     message,
-    //   }),
-    // })
-    //   .then((res) => res.json())
-    //   .then((res) => {
-    //     setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: res.data.reason }])
-    //   })
-
-    let responseMessage = 'test'
-    let actions = [
-      { "label": "button label", "action": "add_to_cart", "item_id": "id here" }
-    ]
-
-    setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: responseMessage }])
-
-    if (actions.length > 0) {
-      actions.map((action) => {
-        setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: action.label, type: "action" }])
+  const createChat = (message: string) => {
+    fetch(`http://localhost:3000/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        message,
+      }),
+    })
+      .then((res) => res.json())
+      .then((res) => {
+        setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: res.data.message }])
+        renderActions(res.data.actions)
       })
-    }
   }
 
   useEffect(() => {
@@ -66,11 +62,40 @@ export default function AIChatFAB() {
     createChat(trimmed)
   }
 
-  const handleKeyDown = (e) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault()
       handleSend()
     }
+  }
+
+  const renderActions = (actions: any[]) => {
+    if (actions.length === 0) return
+
+    actions.map((action) => {
+      setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: action.label, type: "action", itemId: action.item_id }])
+    })
+  }
+
+  const handleSuggestionClick = (e: React.MouseEvent<HTMLAnchorElement>, productId: string) => {
+    const el = e.currentTarget;
+    el.style.transition = 'opacity 0.5s';
+    el.style.opacity = '0';
+    setTimeout(() => el.remove(), 500);
+
+    cartService
+      .addToCart(productId)
+      .then(() => {
+        toast.success("Item added to cart", {
+          description: "Check your cart for more details",
+          action: {
+            label: "View Cart",
+            onClick: () => {
+              navigate("/cart")
+            }
+          }
+        })
+      });
   }
 
   return (
@@ -95,11 +120,10 @@ export default function AIChatFAB() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-3 space-y-3 max-h-72">
-            {messages.map((msg) =>
+            {messages.map((msg: Message) =>
               msg.type === "action"
                 ? (
-                  <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
-                    <Item variant="outline" size="sm" asChild>
+                    <Item className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`} variant="outline" size="sm" asChild onClick={(e) => handleSuggestionClick(e, msg.itemId)}>
                       <a href="#">
                         <ItemContent>
                           <ItemTitle>{msg.text}</ItemTitle>
@@ -109,10 +133,9 @@ export default function AIChatFAB() {
                         </ItemActions>
                       </a>
                     </Item>
-                  </div>
                 )
                 : (
-                  <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                  <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div
                       className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${msg.role === "user"
                         ? "bg-gradient-to-br from-violet-500 to-blue-500 text-white rounded-br-sm"

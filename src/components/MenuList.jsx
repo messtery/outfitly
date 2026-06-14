@@ -1,4 +1,7 @@
+"use client"
+
 import React, { useState, useEffect } from "react";
+import { toast, Toaster } from "sonner"
 import { Input } from "./ui/input";
 import { Button } from "./ui/button";
 import { Badge } from "@/components/ui/badge"
@@ -10,12 +13,15 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card"
+import { cartService } from "../services/CartService";
+import { useNavigate } from "react-router-dom";
 
 export default function MenuList() {
   const [search, setSearch] = useState("");
   const [category, setCategory] = useState("All");
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
   const fetchProducts = () => {
     fetch('http://localhost:3000/products')
@@ -29,20 +35,18 @@ export default function MenuList() {
   }
 
   const handleAddToCart = (productId) => {
-    fetch('http://localhost:3000/cart-items', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${localStorage.token}`,
-      },
-      body: JSON.stringify({
-        productId,
-        qty: 1,
-      }),
-    })
-      .then((res) => res.json())
+    cartService
+      .addToCart(productId)
       .then((res) => {
-        alert('Added to cart')
+        toast.success("Item added to cart", {
+          description: "Check your cart for more details",
+          action: {
+            label: "View Cart",
+            onClick: () => {
+              navigate("/cart")
+            }
+          }
+        })
       })
   }
 
@@ -60,7 +64,7 @@ export default function MenuList() {
     )
   }
 
-  if (! products.length) {
+  if (!products.length) {
     return (
       <>
         <div className="w-full h-screen flex items-center justify-center">
@@ -87,7 +91,7 @@ export default function MenuList() {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {products.map((product) => (
-          <Card className="relative mx-auto w-full max-w-sm pt-0">
+          <Card key={product.id} className="relative mx-auto w-full max-w-sm pt-0">
             <div className="absolute inset-0 z-30 aspect-video bg-black/35" />
             <img
               src="https://avatar.vercel.sh/shadcn1"
