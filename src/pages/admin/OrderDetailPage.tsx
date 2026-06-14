@@ -10,7 +10,7 @@ import AdminSidebar from "@/components/AdminSidebar"
 import type { Order } from "@/types/order"
 import { paymentStatusColors } from "@/types/order"
 
-export default function AdminOrderDetail() {
+export default function OrderDetailPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const order = location.state?.order as Order | undefined

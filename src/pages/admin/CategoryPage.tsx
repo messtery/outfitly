@@ -22,7 +22,7 @@ const initialCategories: Category[] = [
   { id: 2, name: "Drink", totalProducts: 1 },
 ]
 
-export default function AdminCategoryManagement() {
+export default function CategoryPage() {
   const [categories, setCategories] = useState<Category[]>(initialCategories)
   const nextCategoryId = useRef(
     initialCategories.length
