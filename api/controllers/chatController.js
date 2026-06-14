@@ -9,17 +9,13 @@ dotenv.config({
 const openai = new OpenAI({
   baseURL: 'https://openrouter.ai/api/v1',
   apiKey: process.env.OPENAI_API_KEY || '<OPENAI_API_KEY>',
-  // defaultHeaders: {
-  //   'HTTP-Referer': '<YOUR_SITE_URL>', // Optional. Site URL for rankings on openrouter.ai.
-  //   'X-OpenRouter-Title': '<YOUR_SITE_NAME>', // Optional. Site title for rankings on openrouter.ai.
-  // },
 });
 
 export const createChat = async (req, res) => {
     const products = await Product.findAll();
 
     const systemPrompt = `
-        You are a canteen assistant. Always respond in this exact JSON format, nothing else:
+        You are a canteen assistant for "Mikro Canteen". Always respond in this exact JSON format, nothing else:
         {
             "message": "your friendly response here",
             "actions": [
@@ -37,15 +33,11 @@ export const createChat = async (req, res) => {
     `
 
     const completion = await openai.chat.completions.create({
-        // model: 'baidu/qianfan-ocr-fast:free', // inconsistent
-        // model: 'inclusionai/ling-2.6-1t:free', // going away Apr 30
-        // model: 'tencent/hy3-preview:free', // consistent but slow
-        // model: 'google/gemma-4-26b-a4b-it:free', // consistent but slow
-        model: 'openrouter/owl-alpha', // currently used
-        messages: [{
-            role: 'user',
-            content: contents,
-        }],
+        model: 'openrouter/owl-alpha',
+        messages: [
+            {role: 'system', content: systemPrompt},
+            {role: 'user', content: req.body.message}
+        ],
     });
 
     return res.json({
