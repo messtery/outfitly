@@ -1,5 +1,15 @@
 import { useState, useRef, useEffect } from "react"
-import { Bot, X, Send } from "lucide-react"
+import { Bot, X, Send, CirclePlus } from "lucide-react"
+import { Button } from "@/components/ui/button"
+import { ChevronRightIcon } from "lucide-react"
+import {
+  Item,
+  ItemActions,
+  ItemContent,
+  ItemDescription,
+  ItemMedia,
+  ItemTitle,
+} from "@/components/ui/item"
 
 const FAB_POSITION = "bottom-20 right-4"
 
@@ -14,21 +24,34 @@ export default function AIChatFAB() {
   const messagesEndRef = useRef(null)
 
   const createChat = (message) => {
-    fetch(`http://localhost:3000/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        message,
-      }),
-    })
-      .then((res) => res.json())
-      .then((res) => {
-        setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: res.data.reason }])
+    // fetch(`http://localhost:3000/chat`, {
+    //   method: 'POST',
+    //   headers: {
+    //     'Content-Type': 'application/json',
+    //   },
+    //   body: JSON.stringify({
+    //     message,
+    //   }),
+    // })
+    //   .then((res) => res.json())
+    //   .then((res) => {
+    //     setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: res.data.reason }])
+    //   })
+
+    let responseMessage = 'test'
+    let actions = [
+      { "label": "button label", "action": "add_to_cart", "item_id": "id here" }
+    ]
+
+    setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: responseMessage }])
+
+    if (actions.length > 0) {
+      actions.map((action) => {
+        setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: action.label, type: "action" }])
       })
+    }
   }
-  
+
   useEffect(() => {
     if (isOpen && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
@@ -72,21 +95,35 @@ export default function AIChatFAB() {
 
           {/* Messages */}
           <div className="flex-1 overflow-y-auto p-3 space-y-3 max-h-72">
-            {messages.map((msg) => (
-              <div
-                className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}
-              >
-                <div
-                  className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${
-                    msg.role === "user"
-                      ? "bg-gradient-to-br from-violet-500 to-blue-500 text-white rounded-br-sm"
-                      : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm"
-                  }`}
-                >
-                  {msg.text}
-                </div>
-              </div>
-            ))}
+            {messages.map((msg) =>
+              msg.type === "action"
+                ? (
+                  <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <Item variant="outline" size="sm" asChild>
+                      <a href="#">
+                        <ItemContent>
+                          <ItemTitle>{msg.text}</ItemTitle>
+                        </ItemContent>
+                        <ItemActions>
+                          <CirclePlus />
+                        </ItemActions>
+                      </a>
+                    </Item>
+                  </div>
+                )
+                : (
+                  <div className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
+                    <div
+                      className={`max-w-[75%] rounded-2xl px-3 py-2 text-sm ${msg.role === "user"
+                        ? "bg-gradient-to-br from-violet-500 to-blue-500 text-white rounded-br-sm"
+                        : "bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm"
+                        }`}
+                    >
+                      {msg.text}
+                    </div>
+                  </div>
+                )
+            )}
             <div ref={messagesEndRef} />
           </div>
 

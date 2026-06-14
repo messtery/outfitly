@@ -18,32 +18,30 @@ const openai = new OpenAI({
 export const createChat = async (req, res) => {
     const products = await Product.findAll();
 
-    const contents = `
+    const systemPrompt = `
+        You are a canteen assistant. Always respond in this exact JSON format, nothing else:
+        {
+            "message": "your friendly response here",
+            "actions": [
+                { "label": "button label", "action": "add_to_cart", "item_id": "id here" }
+            ]
+        }
+        If no buttons are needed, return actions as an empty array [].
+
         Available menu (id:name):
         ${
           products
             .map(p => `- ${p.id}:${p.name}`)
             .join("\n")
         }
-
-        I need straight and rational answer.
-        
-        ${
-          req.body.message
-        }.
-        Recommend one.
-
-        response format (plain text, no markdown, no code block):
-        {
-            id,
-            reason,
-        }
     `
+
     const completion = await openai.chat.completions.create({
-        model: 'baidu/qianfan-ocr-fast:free', // in consistent
+        // model: 'baidu/qianfan-ocr-fast:free', // inconsistent
         // model: 'inclusionai/ling-2.6-1t:free', // going away Apr 30
         // model: 'tencent/hy3-preview:free', // consistent but slow
         // model: 'google/gemma-4-26b-a4b-it:free', // consistent but slow
+        model: 'openrouter/owl-alpha', // currently used
         messages: [{
             role: 'user',
             content: contents,
