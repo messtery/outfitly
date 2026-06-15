@@ -9,8 +9,9 @@ import {
 import { cartService } from "../services/CartService"
 import { toast } from "sonner"
 import { useNavigate } from "react-router-dom"
+import { useLocation } from "react-router-dom"
 
-const FAB_POSITION = "bottom-20 right-4"
+const MAIN_PATHS = ["/menu", "/cart", "/profile"]
 
 let nextId = 2
 
@@ -23,6 +24,11 @@ type Message = {
 }
 
 export default function AIChatFAB() {
+  const location = useLocation()
+  const fabPosition = MAIN_PATHS.includes(location.pathname)
+    ? "bottom-20 right-4"
+    : "bottom-4 right-4"
+
   const [isOpen, setIsOpen] = useState(false)
   const [message, setMessage] = useState("")
   const [messages, setMessages] = useState<Message[]>([
@@ -102,7 +108,7 @@ export default function AIChatFAB() {
     <>
       {/* Chat panel */}
       {isOpen && (
-        <div className={`fixed ${FAB_POSITION} z-50 w-80 rounded-2xl shadow-2xl border bg-white dark:bg-black flex flex-col overflow-hidden`}>
+        <div className={`fixed ${fabPosition} z-50 w-80 rounded-2xl shadow-2xl border bg-white dark:bg-black flex flex-col overflow-hidden`}>
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 bg-gradient-to-r from-violet-500 to-blue-500">
             <div className="flex items-center gap-2 text-white">
@@ -175,7 +181,7 @@ export default function AIChatFAB() {
       {/* FAB */}
       <button
         onClick={() => setIsOpen((prev) => !prev)}
-        className={`fixed ${FAB_POSITION} z-50 w-14 h-14 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white shadow-lg flex items-center justify-center hover:cursor-pointer hover:scale-105 active:scale-95 transition-transform`}
+        className={`fixed ${fabPosition} z-50 w-14 h-14 rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white shadow-lg flex items-center justify-center hover:cursor-pointer hover:scale-105 active:scale-95 transition-transform`}
         aria-label="Open AI chat"
       >
         <Bot className="w-6 h-6" />

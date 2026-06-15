@@ -2,7 +2,6 @@ import OrderTimeline from "@/components/order/OrderTimeline"
 import OrderDetails from "@/components/order/OrderDetails"
 import OrderActions from "@/components/order/OrderActions"
 import OrderEstimate from "@/components/order/OrderEstimate"
-import AIChatFAB from "@/components/AIChatFAB"
 import { useParams } from "react-router-dom"
 import { useEffect, useState } from "react"
 
@@ -24,8 +23,8 @@ export default function OrderTrackingPage() {
 
   if (!order) {
     return (
-      <div className="w-full h-screen flex items-center justify-center">
-        <h1 className="text-2xl font-bold">Loading...</h1>
+      <div className="flex items-center justify-center py-24">
+        <p className="text-muted-foreground">Loading...</p>
       </div>
     )
   }
@@ -39,7 +38,6 @@ export default function OrderTrackingPage() {
         onCancel={() => console.log("Pesanan dibatalkan")}
         onRepeat={() => console.log("Repeat order")}
       />
-      <AIChatFAB />
     </div>
   )
 }
