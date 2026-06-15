@@ -1,5 +1,4 @@
 import OrderHistory from "@/components/order/OrderHistory"
-import AIChatFAB from "@/components/AIChatFAB"
 import { useEffect, useState } from "react"
 
 export default function OrderHistoryPage() {
@@ -13,18 +12,14 @@ export default function OrderHistoryPage() {
         },
       });
       const json = await res.json();
-  
       setOrders(json.data);
-      console.log(orders);
     }
-
     fetchOrders()
   }, [])
 
   return (
     <div className="max-w-md mx-auto p-4">
       <OrderHistory orders={orders} />
-      <AIChatFAB />
     </div>
   )
 }
