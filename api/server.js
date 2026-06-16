@@ -9,6 +9,7 @@ import productRoutes from './routes/productRoutes.js';
 import chatRoutes from './routes/chatRoutes.js';
 import adminRoutes from './routes/adminRoutes.js';
 import {checkout} from './controllers/checkoutController.js';
+import { checkPaymentStatus } from './controllers/paymentController.js';
 import {
   get as getCartItems,
   create as createCart,
@@ -59,6 +60,7 @@ api.put('/cart-items', authMiddleware, updateCartItem);
 api.delete('/cart-items/:id', authMiddleware, removeCartItem);
 
 api.post('/checkout', authMiddleware, checkout);
+api.get('/orders/:id/payment-status', authMiddleware, checkPaymentStatus);
 
 app.use('/api', api);
 
