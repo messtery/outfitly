@@ -7,9 +7,20 @@ import Customer from '../models/customer.js';
 
 const xendit = new Xendit({ secretKey: process.env.XENDIT_KEY });
 
+const XENDIT_PAYMENT_METHODS = {
+  cash: ['RETAIL_OUTLET'],
+  qris: ['QRIS'],
+  transfer: ['CALLBACK_VIRTUAL_ACCOUNT'],
+};
+
 export const checkout = async (req, res) => {
   try {
     const customerId = req.user.id;
+    const { paymentMethod } = req.body;
+
+    if (!paymentMethod || !XENDIT_PAYMENT_METHODS[paymentMethod]) {
+      return res.status(400).json({ message: 'Invalid payment method. Choose cash, qris, or transfer.' });
+    }
 
     const cart = await Cart.findOne({
       where: { customerId },
@@ -47,6 +58,7 @@ export const checkout = async (req, res) => {
           givenNames: customer.name,
           email: customer.email,
         },
+        paymentMethods: XENDIT_PAYMENT_METHODS[paymentMethod],
         successRedirectUrl: `http://localhost:5173/ordertracking/${order.id}`,
         failureRedirectUrl: `http://localhost:5173/ordertracking/${order.id}`,
       },
