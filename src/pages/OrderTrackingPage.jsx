@@ -65,23 +65,30 @@ export default function OrderTrackingPage() {
         <Badge variant={statusCfg.variant}>{statusCfg.label}</Badge>
       </div>
 
-      {order.paymentStatus === 'pending' && (
+      {order.paymentStatus === 'pending' && !order.invoiceUrl && (
+        <div className="rounded-lg border border-border bg-muted/30 p-4">
+          <p className="text-sm font-medium">Waiting for payment confirmation</p>
+          <p className="text-xs text-muted-foreground mt-1">
+            Please pay at the cashier. The admin will confirm your payment.
+          </p>
+        </div>
+      )}
+
+      {order.paymentStatus === 'pending' && order.invoiceUrl && (
         <div className="rounded-lg border border-border bg-muted/30 p-4 space-y-3">
           <p className="text-sm text-muted-foreground">
             Complete your payment to confirm your order.
           </p>
           <div className="flex gap-2">
-            {order.invoiceUrl && (
-              <Button
-                variant="outline"
-                size="sm"
-                className="flex-1"
-                onClick={() => window.open(order.invoiceUrl, '_blank')}
-              >
-                <ExternalLink className="w-4 h-4 mr-2" />
-                Open Payment Page
-              </Button>
-            )}
+            <Button
+              variant="outline"
+              size="sm"
+              className="flex-1"
+              onClick={() => window.open(order.invoiceUrl, '_blank')}
+            >
+              <ExternalLink className="w-4 h-4 mr-2" />
+              Open Payment Page
+            </Button>
             <Button
               size="sm"
               className="flex-1"
