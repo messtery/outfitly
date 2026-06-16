@@ -23,6 +23,10 @@ import {
 } from './controllers/authController.js'
 import { login as adminLogin } from './controllers/admin/adminAuthController.js';
 import cors from 'cors';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 const app = express();
 const PORT = 3000;
@@ -30,11 +34,8 @@ const PORT = 3000;
 app.use(express.json());
 app.use(cors({
   origin: 'http://localhost:5173'
-}))
-app.use((req, res, next) => {
-  res.setHeader('Content-Type', 'application/json');
-  next();
-});
+}));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 const api = express.Router();
 

@@ -5,6 +5,7 @@ import * as productController from '../controllers/admin/productController.js'
 import * as roleController from '../controllers/admin/roleController.js'
 import * as userController from '../controllers/admin/userController.js'
 import * as adminAuthController from '../controllers/admin/adminAuthController.js'
+import { upload } from '../middlewares/uploadMiddleware.js'
 // import * as categoryController from '../controllers/admin/categoryController.js'
 
 const router = express.Router()
@@ -30,11 +31,11 @@ router.delete('/orders/:id', orderController.remove);;
 // router.use('/orders/:orderId/items', orderItemRoutes);
 // router.use('/api', categoryRoutes);
 
-router.post('/products', productController.createProduct);
+router.post('/products', upload.single('image'), productController.createProduct);
 router.get('/products', productController.getProducts);
 router.delete('/products/bulk', productController.bulkDeleteProducts);
 router.get('/products/:id', productController.getProductById);
-router.put('/products/:id', productController.updateProduct);
+router.put('/products/:id', upload.single('image'), productController.updateProduct);
 router.delete('/products/:id', productController.deleteProduct);
 
 router.get('/roles/all', roleController.findAllSimple);

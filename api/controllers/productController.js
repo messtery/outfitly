@@ -37,7 +37,7 @@ export const getProducts = async (req, res) => {
             where: whereClause,
             limit: parseInt(limit),
             offset: parseInt(offset),
-            attributes: ['id', 'name', 'price', 'description', 'categoryId'],
+            attributes: ['id', 'name', 'price', 'description', 'image', 'categoryId'],
             include: [
               {
                 model: Category,

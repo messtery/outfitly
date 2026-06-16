@@ -19,6 +19,10 @@ const Product = sequelize.define('products', {
   description: {
     type: DataTypes.STRING,
   },
+  image: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
   categoryId: {
     type: DataTypes.BIGINT,
     allowNull: false,
