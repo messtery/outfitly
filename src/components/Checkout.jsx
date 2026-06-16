@@ -32,14 +32,19 @@ export default function Checkout() {
       <CardContent className="space-y-4">
         <ul className="space-y-3">
           {cartItems.map((cartItem) => (
-            <li key={cartItem.id} className="flex items-center justify-between">
+            <li key={cartItem.id} className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-3">
-                <span className="flex items-center justify-center w-6 h-6 rounded-full bg-muted text-xs font-semibold">
-                  {cartItem.qty}
-                </span>
-                <span className="text-sm">{cartItem.product.name}</span>
+                <img
+                  src={cartItem.product.image || '/placeholder-product.svg'}
+                  alt={cartItem.product.name}
+                  className="w-10 h-10 rounded-md object-cover shrink-0"
+                />
+                <div>
+                  <span className="block text-sm font-medium">{cartItem.product.name}</span>
+                  <span className="text-xs text-muted-foreground">×{cartItem.qty}</span>
+                </div>
               </div>
-              <span className="text-sm font-medium">Rp {(cartItem.price * cartItem.qty).toLocaleString()}</span>
+              <span className="text-sm font-medium shrink-0">Rp {(cartItem.price * cartItem.qty).toLocaleString()}</span>
             </li>
           ))}
         </ul>
