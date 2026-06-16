@@ -100,9 +100,9 @@ export default function Cart() {
                 <TableRow key={cartItem.id}>
                   <TableCell className="flex items-center gap-3">
                     <img
-                      src={"https://avatar.vercel.sh/shadcn1"}
+                      src={cartItem.product.image || '/placeholder-product.svg'}
                       alt={cartItem.product.name}
-                      className="w-12 h-12 rounded-md object-cover grayscale"
+                      className="w-12 h-12 rounded-md object-cover"
                     />
                     <div>
                       <span className="block font-medium">{cartItem.product.name}</span>
