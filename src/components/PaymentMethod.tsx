@@ -1,66 +1,61 @@
 import { useState } from "react"
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
-import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
 import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { useNavigate } from "react-router-dom"
-
-const dummyMethods = [
-    { id: 1, code: "cash", name: "Cash" },
-    { id: 2, code: "qris", name: "QRIS" },
-    { id: 3, code: "transfer", name: "Transfer" },
-]
+import { ExternalLink } from "lucide-react"
 
 export default function PaymentMethod() {
-    const [selected, setSelected] = useState("")
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate()
 
-    const checkout = () => {
-        fetch('http://localhost:3000/api/checkout', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${localStorage.token}`,
-            },
-        })
-            .then((res) => res.json())
-            .then((res) => {
-                navigate(`/ordertracking/${res.data.id}`)
+    const checkout = async () => {
+        setLoading(true)
+        try {
+            const res = await fetch('http://localhost:3000/api/checkout', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.token}`,
+                },
             })
+            const data = await res.json()
+            if (!res.ok) throw new Error(data.message)
+
+            window.open(data.data.invoiceUrl, '_blank')
+            navigate(`/ordertracking/${data.data.id}`)
+        } catch (err) {
+            console.error(err)
+        } finally {
+            setLoading(false)
+        }
     }
 
     return (
         <Card>
             <CardHeader className="pb-3">
-                <h2 className="text-xl font-bold">Payment Method</h2>
-                <p className="text-sm text-muted-foreground">Select how you'd like to pay</p>
+                <h2 className="text-xl font-bold">Payment</h2>
+                <p className="text-sm text-muted-foreground">You will be redirected to Xendit's secure payment page</p>
             </CardHeader>
             <CardContent>
-                <RadioGroup value={selected} onValueChange={setSelected} className="space-y-3">
-                    {dummyMethods.map(m => (
-                        <label
-                            key={m.id}
-                            htmlFor={m.code}
-                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
-                                selected === m.code
-                                    ? "border-primary bg-primary/5"
-                                    : "border-border hover:bg-muted/50"
-                            }`}
-                        >
-                            <RadioGroupItem value={m.code} id={m.code} />
-                            <Label htmlFor={m.code} className="cursor-pointer font-medium">{m.name}</Label>
-                        </label>
-                    ))}
-                </RadioGroup>
+                <div className="rounded-lg border border-border bg-muted/30 p-4 text-sm text-muted-foreground space-y-1">
+                    <p>Xendit supports multiple payment methods:</p>
+                    <ul className="list-disc list-inside space-y-0.5 mt-1">
+                        <li>Virtual Account (BCA, BNI, BRI, Mandiri, etc.)</li>
+                        <li>QRIS</li>
+                        <li>Credit / Debit Card</li>
+                        <li>E-Wallet (OVO, GoPay, Dana, etc.)</li>
+                    </ul>
+                </div>
             </CardContent>
             <CardFooter>
                 <Button
                     className="w-full"
                     size="lg"
-                    disabled={!selected}
+                    disabled={loading}
                     onClick={checkout}
                 >
-                    Pay Now
+                    <ExternalLink className="w-4 h-4 mr-2" />
+                    {loading ? 'Processing...' : 'Pay with Xendit'}
                 </Button>
             </CardFooter>
         </Card>

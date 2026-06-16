@@ -29,6 +29,14 @@ const Order = sequelize.define('orders', {
     allowNull: false,
     defaultValue: 'pending'
   },
+  invoiceId: {
+    type: DataTypes.STRING,
+    allowNull: true,
+  },
+  invoiceUrl: {
+    type: DataTypes.TEXT,
+    allowNull: true,
+  },
   createdAt: {
     allowNull: false,
     type: DataTypes.DATE
