@@ -50,6 +50,7 @@ type Product = {
   categoryId: number
   price: number
   description: string | null
+  image: string | null
   category: Category
 }
 
@@ -302,19 +303,29 @@ export default function ProductPage() {
   const [formCategoryId, setFormCategoryId] = useState<number | null>(null)
   const [formPrice, setFormPrice] = useState("")
   const [formDescription, setFormDescription] = useState("")
+  const [formImageFile, setFormImageFile] = useState<File | null>(null)
+  const [formImagePreview, setFormImagePreview] = useState<string | null>(null)
   const [formError, setFormError] = useState("")
 
   const openCreateModal = () => {
     setIsEditMode(false); setEditingId(null); setFormName("")
-    setFormCategoryId(null); setFormPrice(""); setFormDescription(""); setFormError("")
+    setFormCategoryId(null); setFormPrice(""); setFormDescription("")
+    setFormImageFile(null); setFormImagePreview(null); setFormError("")
     setIsModalOpen(true)
   }
 
   const openEditModal = (p: Product) => {
     setIsEditMode(true); setEditingId(p.id); setFormName(p.name)
     setFormCategoryId(p.categoryId); setFormPrice(String(p.price))
-    setFormDescription(p.description ?? ""); setFormError("")
+    setFormDescription(p.description ?? "")
+    setFormImageFile(null); setFormImagePreview(p.image ?? null); setFormError("")
     setIsModalOpen(true)
+  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null
+    setFormImageFile(file)
+    if (file) setFormImagePreview(URL.createObjectURL(file))
   }
 
   // ── Category quick-add ──────────────────────────────────────────────────────
@@ -339,18 +350,15 @@ export default function ProductPage() {
       setFormError("Please fill all required fields with valid values.")
       return
     }
+    const body = new FormData()
+    body.append("name", formName.trim())
+    body.append("categoryId", String(formCategoryId))
+    body.append("price", String(parsedPrice))
+    body.append("description", formDescription.trim())
+    if (formImageFile) body.append("image", formImageFile)
     await fetch(
       isEditMode ? `${API}/admin/products/${editingId}` : `${API}/admin/products`,
-      {
-        method: isEditMode ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: formName.trim(),
-          categoryId: formCategoryId,
-          price: parsedPrice,
-          description: formDescription.trim() || null,
-        }),
-      }
+      { method: isEditMode ? "PUT" : "POST", body }
     )
     setIsModalOpen(false)
     fetchProducts()
@@ -397,6 +405,18 @@ export default function ProductPage() {
       ),
       enableSorting: false,
       enableColumnFilter: false,
+    },
+    {
+      accessorKey: "image",
+      header: "Image",
+      enableSorting: false,
+      enableColumnFilter: false,
+      cell: ({ getValue }) => {
+        const url = getValue() as string | null
+        return url
+          ? <img src={url} alt="product" className="h-10 w-16 rounded object-cover" />
+          : <span className="text-xs text-muted-foreground">—</span>
+      },
     },
     { accessorKey: "name", header: "Name", enableSorting: true, enableColumnFilter: true },
     {
@@ -623,6 +643,13 @@ export default function ProductPage() {
             <div className="grid gap-2">
               <Label htmlFor="form-description">Description</Label>
               <Input id="form-description" placeholder="Optional description" value={formDescription} onChange={(e) => setFormDescription(e.target.value)} />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="form-image">Image</Label>
+              {formImagePreview && (
+                <img src={formImagePreview} alt="preview" className="h-32 w-full rounded-md object-cover" />
+              )}
+              <Input id="form-image" type="file" accept="image/*" onChange={handleImageChange} className="cursor-pointer" />
             </div>
             {formError && <p className="text-sm text-destructive" role="alert">{formError}</p>}
             <DialogFooter>
