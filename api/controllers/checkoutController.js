@@ -8,17 +8,18 @@ import Customer from '../models/customer.js';
 const xendit = new Xendit({ secretKey: process.env.XENDIT_KEY });
 
 const XENDIT_PAYMENT_METHODS = {
-  cash: ['RETAIL_OUTLET'],
   qris: ['QRIS'],
   transfer: ['CALLBACK_VIRTUAL_ACCOUNT'],
 };
+
+const VALID_METHODS = ['cash', 'qris', 'transfer'];
 
 export const checkout = async (req, res) => {
   try {
     const customerId = req.user.id;
     const { paymentMethod } = req.body;
 
-    if (!paymentMethod || !XENDIT_PAYMENT_METHODS[paymentMethod]) {
+    if (!paymentMethod || !VALID_METHODS.includes(paymentMethod)) {
       return res.status(400).json({ message: 'Invalid payment method. Choose cash, qris, or transfer.' });
     }
 
@@ -31,7 +32,6 @@ export const checkout = async (req, res) => {
       return res.status(400).json({ message: 'Cart is empty' });
     }
 
-    const customer = await Customer.findByPk(customerId);
     const total = cart.items.reduce((sum, item) => sum + item.price * item.qty, 0);
 
     const order = await Order.create({
@@ -46,6 +46,14 @@ export const checkout = async (req, res) => {
     }, {
       include: [{ model: OrderItem, as: 'items' }],
     });
+
+    await Cart.destroy({ where: { id: cart.id } });
+
+    if (paymentMethod === 'cash') {
+      return res.status(201).json({ data: order.toJSON() });
+    }
+
+    const customer = await Customer.findByPk(customerId);
 
     const invoice = await xendit.Invoice.createInvoice({
       data: {
@@ -68,8 +76,6 @@ export const checkout = async (req, res) => {
       invoiceId: invoice.id,
       invoiceUrl: invoice.invoiceUrl,
     });
-
-    await Cart.destroy({ where: { id: cart.id } });
 
     res.status(201).json({
       data: {

@@ -10,7 +10,7 @@ const paymentMethods = [
     {
         code: "cash",
         name: "Cash",
-        description: "Pay at Alfamart / Indomaret",
+        description: "Pay directly to the cashier",
     },
     {
         code: "qris",
@@ -43,7 +43,9 @@ export default function PaymentMethod() {
             const data = await res.json()
             if (!res.ok) throw new Error(data.message)
 
-            window.open(data.data.invoiceUrl, '_blank')
+            if (data.data.invoiceUrl) {
+                window.open(data.data.invoiceUrl, '_blank')
+            }
             navigate(`/ordertracking/${data.data.id}`)
         } catch (err) {
             console.error(err)
@@ -86,8 +88,8 @@ export default function PaymentMethod() {
                     disabled={!selected || loading}
                     onClick={checkout}
                 >
-                    <ExternalLink className="w-4 h-4 mr-2" />
-                    {loading ? 'Processing...' : 'Pay with Xendit'}
+                    {selected !== 'cash' && <ExternalLink className="w-4 h-4 mr-2" />}
+                    {loading ? 'Processing...' : selected === 'cash' ? 'Place Order' : 'Pay with Xendit'}
                 </Button>
             </CardFooter>
         </Card>
