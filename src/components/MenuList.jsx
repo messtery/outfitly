@@ -66,7 +66,6 @@ export default function MenuList() {
 
   return (
     <div className="p-6 max-w-5xl mx-auto">
-      <Toaster />
       <h1 className="text-3xl font-bold mb-4">Canteen Menu</h1>
 
       <div className="flex flex-col sm:flex-row gap-3 mb-6">

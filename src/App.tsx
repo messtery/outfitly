@@ -9,7 +9,9 @@ import OrderHistory from './pages/OrderHistoryPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx';
 import AccountSettingsPage from './pages/AccountSettingsPage';
 import ProtectedLayout from "./middlewares/ProtectedLayout.jsx"
+import GuestLayout from "./middlewares/GuestLayout.jsx"
 import AdminProtectedLayout from "./middlewares/AdminProtectedLayout";
+import AdminGuestLayout from "./middlewares/AdminGuestLayout";
 import { TooltipProvider } from "@/components/ui/tooltip"
 import AdminLayout from "./layouts/AdminLayout.js";
 import CustomerLayout from "./layouts/CustomerLayout.jsx";
@@ -31,8 +33,10 @@ function App() {
       <BrowserRouter>
         <Routes>
           <Route path="/" element={<Navigate to="/login" replace />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<Register />} />
+          <Route element={<GuestLayout />}>
+            <Route path="/login" element={<LoginPage />} />
+            <Route path="/register" element={<Register />} />
+          </Route>
 
           <Route element={<ProtectedLayout />}>
             <Route element={<CustomerLayout />}>
@@ -47,7 +51,9 @@ function App() {
           </Route>
 
           <Route path="/admin" element={<AdminAuthProvider><Navigate to="/admin/login" replace /></AdminAuthProvider>} />
-          <Route path="/admin/login" element={<AdminAuthProvider><AdminLoginPage /></AdminAuthProvider>} />
+          <Route element={<AdminAuthProvider><AdminGuestLayout /></AdminAuthProvider>}>
+            <Route path="/admin/login" element={<AdminLoginPage />} />
+          </Route>
           <Route element={<AdminAuthProvider><AdminProtectedLayout /></AdminAuthProvider>}>
             <Route element={<AdminLayout />}>
               <Route path="/admin/dashboard" element={<DashboardPage />} />
