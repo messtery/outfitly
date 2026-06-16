@@ -1,6 +1,7 @@
 import {
   SidebarGroup,
   SidebarGroupContent,
+  SidebarGroupLabel,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -15,19 +16,20 @@ type Item = {
 
 export function NavMain({
   items,
+  label,
 }: {
   items: Item[]
+  label?: string
 }) {
   const navigate = useNavigate()
 
   return (
     <SidebarGroup>
+      {label && <SidebarGroupLabel>{label}</SidebarGroupLabel>}
       <SidebarGroupContent className="flex flex-col gap-2">
         <SidebarMenu>
           {items.map((item) => (
-            <SidebarMenuItem key={item.title} onClick={() => {
-              navigate(item.url)
-            }}>
+            <SidebarMenuItem key={item.title} onClick={() => navigate(item.url)}>
               <SidebarMenuButton tooltip={item.title}>
                 {item.icon}
                 <span>{item.title}</span>

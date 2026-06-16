@@ -1,19 +1,48 @@
-import { useEffect, useRef, useState } from "react"
-import { Button } from "@/components/ui/button"
+import { Fragment, useEffect, useState } from "react"
+import type { ComponentProps } from "react"
+import { useSearchParams } from "react-router-dom"
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card"
+  flexRender,
+  getCoreRowModel,
+  useReactTable,
+  type ColumnDef,
+  type ColumnFiltersState,
+  type RowSelectionState,
+  type SortingState,
+} from "@tanstack/react-table"
+import { useDebounce } from "@/hooks/useDebounce"
+import { Button } from "@/components/ui/button"
+import { Checkbox } from "@/components/ui/checkbox"
+import {
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import { Skeleton } from "@/components/ui/skeleton"
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table"
+import {
+  ChevronDownIcon,
+  ChevronUpIcon,
+  ChevronsUpDownIcon,
+  PencilIcon,
+  PlusIcon,
+  Trash2Icon,
+} from "lucide-react"
 
-type Category = {
-  id: number
-  name: string
-}
+// ─── Types ────────────────────────────────────────────────────────────────────
+
+type Category = { id: number; name: string }
 
 type Product = {
   id: number
@@ -24,277 +53,585 @@ type Product = {
   category: Category
 }
 
-const selectFieldClassName =
-  "h-8 w-full min-w-0 rounded-lg border border-input bg-transparent px-2.5 py-1 text-base transition-colors outline-none placeholder:text-muted-foreground focus-visible:border-ring focus-visible:ring-3 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:cursor-not-allowed disabled:bg-input/50 disabled:opacity-50 md:text-sm dark:bg-input/30 dark:disabled:bg-input/80"
+// ─── Constants ────────────────────────────────────────────────────────────────
+
+const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
+const FILTERABLE_COLS = ["name", "category", "price", "description"] as const
+const API = "http://localhost:3000"
+
+// ─── Currency Input ───────────────────────────────────────────────────────────
+
+type CurrencyInputProps = Omit<ComponentProps<typeof Input>, "value" | "onChange"> & {
+  rawValue: string
+  onRawChange: (raw: string) => void
+}
+
+function CurrencyInput({ rawValue, onRawChange, ...props }: CurrencyInputProps) {
+  const formatted = rawValue ? Number(rawValue).toLocaleString("id-ID") : ""
+  return (
+    <Input
+      value={formatted}
+      onChange={(e) => onRawChange(e.target.value.replace(/\D/g, ""))}
+      inputMode="numeric"
+      placeholder="0"
+      {...props}
+    />
+  )
+}
+
+// ─── Category Combobox ────────────────────────────────────────────────────────
+
+type CategoryComboboxProps = {
+  categories: Category[]
+  value: number | null
+  onChange: (id: number) => void
+  onAddCategory: (name: string) => Promise<Category>
+}
+
+function CategoryCombobox({ categories, value, onChange, onAddCategory }: CategoryComboboxProps) {
+  const [search, setSearch] = useState("")
+  const [isOpen, setIsOpen] = useState(false)
+
+  const selected = categories.find((c) => c.id === value)
+  const filtered = categories.filter((c) =>
+    c.name.toLowerCase().includes(search.toLowerCase())
+  )
+  const exactMatch = filtered.some(
+    (c) => c.name.toLowerCase() === search.trim().toLowerCase()
+  )
+
+  const handleSelect = (cat: Category) => {
+    onChange(cat.id)
+    setSearch(cat.name)
+    setIsOpen(false)
+  }
+
+  return (
+    <div className="relative">
+      <Input
+        value={isOpen ? search : (selected?.name ?? "")}
+        onChange={(e) => setSearch(e.target.value)}
+        onFocus={() => { setSearch(selected?.name ?? ""); setIsOpen(true) }}
+        onBlur={() => setTimeout(() => setIsOpen(false), 150)}
+        placeholder="Search or select category..."
+        autoComplete="off"
+      />
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-full overflow-y-auto rounded-lg border bg-popover shadow-md max-h-48">
+          {filtered.map((cat) => (
+            <button
+              key={cat.id}
+              type="button"
+              className="flex w-full items-center px-3 py-2 text-sm text-left hover:bg-accent hover:text-accent-foreground"
+              onMouseDown={() => handleSelect(cat)}
+            >
+              {cat.name}
+            </button>
+          ))}
+          {search.trim() && !exactMatch && (
+            <button
+              type="button"
+              className="flex w-full items-center gap-1.5 px-3 py-2 text-sm font-medium text-left text-primary hover:bg-accent hover:text-accent-foreground"
+              onMouseDown={async () => { const c = await onAddCategory(search.trim()); handleSelect(c) }}
+            >
+              <PlusIcon className="size-3.5" />
+              Add &ldquo;{search.trim()}&rdquo;
+            </button>
+          )}
+          {!search.trim() && filtered.length === 0 && (
+            <div className="px-3 py-2 text-sm text-muted-foreground">No categories</div>
+          )}
+        </div>
+      )}
+    </div>
+  )
+}
+
+// ─── Sort Icon ────────────────────────────────────────────────────────────────
+
+function SortIcon({ direction }: { direction: "asc" | "desc" | false }) {
+  if (direction === "asc") return <ChevronUpIcon className="size-3.5" />
+  if (direction === "desc") return <ChevronDownIcon className="size-3.5" />
+  return <ChevronsUpDownIcon className="size-3.5 text-muted-foreground/60" />
+}
+
+// ─── ProductPage ──────────────────────────────────────────────────────────────
 
 export default function ProductPage() {
-  const [categories, setCategories] = useState<Category[]>([])
+  const [searchParams, setSearchParams] = useSearchParams()
+
+  // ── Table state (local → URL) ───────────────────────────────────────────────
+
+  const [globalFilter, setGlobalFilter] = useState<string>(
+    () => searchParams.get("q") ?? ""
+  )
+  const [columnFilters, setColumnFilters] = useState<ColumnFiltersState>(() =>
+    FILTERABLE_COLS.flatMap((col) => {
+      const val = searchParams.get(`f_${col}`)
+      return val ? [{ id: col, value: val }] : []
+    })
+  )
+  const [sorting, setSorting] = useState<SortingState>(() => {
+    const s = searchParams.get("sort") ?? ""
+    return s.includes(":") ? [{ id: s.split(":")[0], desc: s.split(":")[1] === "desc" }] : []
+  })
+  const [pageIndex, setPageIndex] = useState<number>(() =>
+    Math.max(0, (parseInt(searchParams.get("page") ?? "1") || 1) - 1)
+  )
+  const [pageSize, setPageSize] = useState<number>(() => {
+    const ps = parseInt(searchParams.get("size") ?? "10")
+    return (PAGE_SIZE_OPTIONS as readonly number[]).includes(ps) ? ps : 10
+  })
+
+  // ── Debounced filter values (sent to API after 500ms) ──────────────────────
+
+  const debouncedGlobalFilter = useDebounce(globalFilter, 500)
+  const debouncedColumnFilters = useDebounce(columnFilters, 500)
+
+  // ── URL sync ────────────────────────────────────────────────────────────────
+
+  useEffect(() => {
+    setSearchParams(
+      (prev) => {
+        const next = new URLSearchParams(prev)
+        if (globalFilter) next.set("q", globalFilter); else next.delete("q")
+        if (pageIndex > 0) next.set("page", String(pageIndex + 1)); else next.delete("page")
+        if (pageSize !== 10) next.set("size", String(pageSize)); else next.delete("size")
+        if (sorting.length > 0)
+          next.set("sort", `${sorting[0].id}:${sorting[0].desc ? "desc" : "asc"}`)
+        else next.delete("sort")
+        FILTERABLE_COLS.forEach((col) => {
+          const f = columnFilters.find((x) => x.id === col)
+          if (f) next.set(`f_${col}`, String(f.value)); else next.delete(`f_${col}`)
+        })
+        return next
+      },
+      { replace: true }
+    )
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [globalFilter, columnFilters, sorting, pageIndex, pageSize])
+
+  // ── Server state ────────────────────────────────────────────────────────────
+
   const [products, setProducts] = useState<Product[]>([])
-  const [name, setName] = useState("")
-  const [categoryId, setCategoryId] = useState(0)
-  const [price, setPrice] = useState("")
-  const [description, setDescription] = useState<string | null>("")
-  const [editingProductId, setEditingProductId] = useState<number | null>(null)
-  const [errorMessage, setErrorMessage] = useState("")
+  const [categories, setCategories] = useState<Category[]>([])
+  const [totalCount, setTotalCount] = useState(0)
+  const [isLoading, setIsLoading] = useState(true)
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
-  const fetchCategories = () => {
-    fetch('http://localhost:3000/api/categories')
-      .then((res) => res.json())
-      .then((res) => {
-        setCategories(res.data)
+  // ── Data fetch ──────────────────────────────────────────────────────────────
+
+  const fetchProducts = async () => {
+    setIsLoading(true)
+    try {
+      const params = new URLSearchParams({
+        page: String(pageIndex + 1),
+        limit: String(pageSize),
       })
+      if (debouncedGlobalFilter) params.set("q", debouncedGlobalFilter)
+      if (sorting.length > 0) {
+        params.set("sort", sorting[0].id)
+        params.set("order", sorting[0].desc ? "desc" : "asc")
+      }
+      debouncedColumnFilters.forEach((f) => {
+        if (f.value) params.set(f.id === "category" ? "category" : String(f.id), String(f.value))
+      })
+      const res = await fetch(`${API}/admin/products?${params}`)
+      const json = await res.json()
+      setProducts(json.data ?? [])
+      setTotalCount(json.meta?.total ?? 0)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
-  const fetchProducts = () => {
-    fetch('http://localhost:3000/products?limit=100')
-      .then((res) => res.json())
-      .then((res) => {
-        setProducts(res.data)
-      })
-  }
-
-  const createProduct = () => {
-    fetch('http://localhost:3000/products', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name,
-        categoryId,
-        price: Number(price),
-        description,
-      }),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        fetchProducts()
-        resetForm()
-      })
-  }
-
-  const editProduct = (id: number) => {
-    fetch(`http://localhost:3000/products/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name,
-        categoryId,
-        price: Number(price),
-        description,
-      }),
-    })
-      .then((res) => res.json())
-      .then(() => {
-        fetchProducts()
-        resetForm()
-      })
-  }
-
-  const deleteProduct = (id: number) => {
-    fetch(`http://localhost:3000/products/${id}`, {
-      method: 'DELETE',
-    })
-      .then((res) => res.json())
-      .then(() => {
-        fetchProducts()
-      })
+  const fetchCategories = async () => {
+    const res = await fetch(`${API}/api/categories?limit=1000`)
+    const json = await res.json()
+    setCategories((json.data as Category[]) ?? [])
   }
 
   useEffect(() => {
     fetchCategories()
-    fetchProducts()
   }, [])
 
-  const resetForm = () => {
-    setName("")
-    setCategoryId(0)
-    setPrice("")
-    setEditingProductId(null)
-    setErrorMessage("")
+  // Refetch when debounced filters, sorting, or pagination changes
+  useEffect(() => {
+    let cancelled = false
+    setIsLoading(true)
+    const params = new URLSearchParams({
+      page: String(pageIndex + 1),
+      limit: String(pageSize),
+    })
+    if (debouncedGlobalFilter) params.set("q", debouncedGlobalFilter)
+    if (sorting.length > 0) {
+      params.set("sort", sorting[0].id)
+      params.set("order", sorting[0].desc ? "desc" : "asc")
+    }
+    debouncedColumnFilters.forEach((f) => {
+      if (f.value) params.set(String(f.id), String(f.value))
+    })
+    fetch(`${API}/admin/products?${params}`)
+      .then((r) => r.json())
+      .then((json) => {
+        if (cancelled) return
+        setProducts(json.data ?? [])
+        setTotalCount(json.meta?.total ?? 0)
+      })
+      .catch(() => {})
+      .finally(() => { if (!cancelled) setIsLoading(false) })
+    return () => { cancelled = true }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedGlobalFilter, debouncedColumnFilters, sorting, pageIndex, pageSize])
+
+  // ── Auto-retreat when page becomes empty ────────────────────────────────────
+
+  useEffect(() => {
+    if (isLoading || totalCount === 0) return
+    const pc = Math.ceil(totalCount / pageSize)
+    if (pageIndex >= pc) setPageIndex(Math.max(0, pc - 1))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [totalCount, isLoading])
+
+  // ── Modal state ─────────────────────────────────────────────────────────────
+
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
+  const [editingId, setEditingId] = useState<number | null>(null)
+  const [formName, setFormName] = useState("")
+  const [formCategoryId, setFormCategoryId] = useState<number | null>(null)
+  const [formPrice, setFormPrice] = useState("")
+  const [formDescription, setFormDescription] = useState("")
+  const [formError, setFormError] = useState("")
+
+  const openCreateModal = () => {
+    setIsEditMode(false); setEditingId(null); setFormName("")
+    setFormCategoryId(null); setFormPrice(""); setFormDescription(""); setFormError("")
+    setIsModalOpen(true)
   }
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
-    event.preventDefault()
-    const parsedPrice = Number(price)
+  const openEditModal = (p: Product) => {
+    setIsEditMode(true); setEditingId(p.id); setFormName(p.name)
+    setFormCategoryId(p.categoryId); setFormPrice(String(p.price))
+    setFormDescription(p.description ?? ""); setFormError("")
+    setIsModalOpen(true)
+  }
 
-    if (
-      !name.trim() ||
-      categoryId === null ||
-      Number.isNaN(parsedPrice) ||
-      parsedPrice <= 0
-    ) {
-      setErrorMessage("Please fill all fields and use a price greater than 0.")
+  // ── Category quick-add ──────────────────────────────────────────────────────
+
+  const handleAddCategory = async (name: string): Promise<Category> => {
+    const res = await fetch(`${API}/api/categories`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    })
+    const cat = (await res.json()) as Category
+    setCategories((prev) => [...prev, cat])
+    return cat
+  }
+
+  // ── CRUD ────────────────────────────────────────────────────────────────────
+
+  const handleSubmit = async (e: { preventDefault(): void }) => {
+    e.preventDefault()
+    const parsedPrice = Number(formPrice)
+    if (!formName.trim() || !formCategoryId || isNaN(parsedPrice) || parsedPrice <= 0) {
+      setFormError("Please fill all required fields with valid values.")
       return
     }
-
-    if (editingProductId) {
-      editProduct(editingProductId)
-      console.log(editingProductId);
-      
-      return
-    }
-    
-    createProduct()
+    await fetch(
+      isEditMode ? `${API}/admin/products/${editingId}` : `${API}/admin/products`,
+      {
+        method: isEditMode ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formName.trim(),
+          categoryId: formCategoryId,
+          price: parsedPrice,
+          description: formDescription.trim() || null,
+        }),
+      }
+    )
+    setIsModalOpen(false)
+    fetchProducts()
   }
 
-  const handleEdit = (product: Product) => {
-    setName(product.name)
-    setCategoryId(product.categoryId)
-    setPrice(String(product.price))
-    setEditingProductId(product.id)
-    setDescription(product.description)
+  const handleDelete = async (id: number) => {
+    await fetch(`${API}/admin/products/${id}`, { method: "DELETE" })
+    fetchProducts()
   }
 
-  const handleDelete = (id: number) => {
-    setProducts((prev) => prev.filter((product) => product.id !== id))
-    if (editingProductId === id) {
-      resetForm()
-    }
-    deleteProduct(id)
+  const handleBulkDelete = async () => {
+    const ids = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number)
+    if (ids.length === 0) return
+    await fetch(`${API}/admin/products/bulk`, {
+      method: "DELETE",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ ids }),
+    })
+    setRowSelection({})
+    fetchProducts()
   }
+
+  // ── Columns ─────────────────────────────────────────────────────────────────
+
+  const columns: ColumnDef<Product>[] = [
+    {
+      id: "select",
+      header: ({ table }) => (
+        <Checkbox
+          checked={
+            table.getIsAllPageRowsSelected() ? true
+              : table.getIsSomePageRowsSelected() ? "indeterminate" : false
+          }
+          onCheckedChange={(v) => table.toggleAllPageRowsSelected(!!v)}
+          aria-label="Select all"
+        />
+      ),
+      cell: ({ row }) => (
+        <Checkbox
+          checked={row.getIsSelected()}
+          onCheckedChange={(v) => row.toggleSelected(!!v)}
+          aria-label="Select row"
+        />
+      ),
+      enableSorting: false,
+      enableColumnFilter: false,
+    },
+    { accessorKey: "name", header: "Name", enableSorting: true, enableColumnFilter: true },
+    {
+      id: "category",
+      accessorFn: (row) => row.category?.name ?? "",
+      header: "Category",
+      enableSorting: true,
+      enableColumnFilter: true,
+    },
+    {
+      accessorKey: "price",
+      header: "Price",
+      cell: ({ getValue }) => `Rp ${(getValue() as number).toLocaleString("id-ID")}`,
+      enableSorting: true,
+      enableColumnFilter: true,
+    },
+    {
+      accessorKey: "description",
+      header: "Description",
+      enableSorting: false,
+      enableColumnFilter: true,
+      cell: ({ getValue }) => (
+        <span className="block max-w-[200px] truncate text-muted-foreground">
+          {(getValue() as string | null) ?? "—"}
+        </span>
+      ),
+    },
+    {
+      id: "actions",
+      header: "",
+      cell: ({ row }) => (
+        <div className="flex gap-1.5">
+          <Button variant="outline" size="icon-sm" onClick={() => openEditModal(row.original)}>
+            <PencilIcon />
+          </Button>
+          <Button variant="destructive" size="icon-sm" onClick={() => handleDelete(row.original.id)}>
+            <Trash2Icon />
+          </Button>
+        </div>
+      ),
+      enableSorting: false,
+      enableColumnFilter: false,
+    },
+  ]
+
+  // ── Table (manual server-side mode) ─────────────────────────────────────────
+
+  const pageCount = Math.max(1, Math.ceil(totalCount / pageSize))
+
+  const table = useReactTable({
+    data: products,
+    columns,
+    getRowId: (row) => String(row.id),
+    state: {
+      sorting,
+      columnFilters,
+      globalFilter,
+      pagination: { pageIndex, pageSize },
+      rowSelection,
+    },
+    manualFiltering: true,
+    manualSorting: true,
+    manualPagination: true,
+    pageCount,
+    onSortingChange: (u) => { setSorting(u); setPageIndex(0) },
+    onColumnFiltersChange: (u) => { setColumnFilters(u); setPageIndex(0) },
+    onGlobalFilterChange: (v: string) => { setGlobalFilter(v); setPageIndex(0) },
+    onPaginationChange: (u) => {
+      const next = typeof u === "function" ? u({ pageIndex, pageSize }) : u
+      if (next.pageSize !== pageSize) { setPageSize(next.pageSize); setPageIndex(0) }
+      else setPageIndex(next.pageIndex)
+    },
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    enableRowSelection: true,
+  })
+
+  const selectedCount = Object.values(rowSelection).filter(Boolean).length
+
+  // ── Render ──────────────────────────────────────────────────────────────────
 
   return (
-    <div className="mx-auto p-6">
-      <div className="grid gap-6">
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Product Management</CardTitle>
-              <CardDescription>
-                Create, update, and delete products.
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form
-                onSubmit={handleSubmit}
-                className="grid gap-4"
-              >
-                <div className="grid gap-2">
-                  <Label htmlFor="product-name">Name</Label>
-                  <Input
-                    id="product-name"
-                    aria-label="Product name"
-                    placeholder="Name"
-                    value={name}
-                    onChange={(event) => setName(event.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="product-category">Category</Label>
-                  <select
-                    id="product-category"
-                    aria-label="Product category"
-                    className={selectFieldClassName}
-                    value={categoryId}
-                    onChange={(event) => setCategoryId(parseInt(event.target.value))}
-                  >
-                    <option value="">Select category</option>
-                    {categories.map((category) => (
-                      <option key={category.id} value={category.id}>
-                        {category.name}
-                      </option>
-                    ))}
-                  </select>
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="product-price">Price</Label>
-                  <Input
-                    id="product-price"
-                    aria-label="Product price"
-                    placeholder="Price"
-                    type="number"
-                    min="1"
-                    value={price}
-                    onChange={(event) => setPrice(event.target.value)}
-                  />
-                </div>
-                <div className="grid gap-2">
-                  <Label htmlFor="product-description">Description</Label>
-                  <Input
-                    id="product-description"
-                    aria-label="Product description"
-                    placeholder="Description"
-                    type="text"
-                    value={description ?? ''}
-                    onChange={(event) => setDescription(event.target.value)}
-                  />
-                </div>
-                <div className="flex items-end gap-2">
-                  <Button type="submit">
-                    {editingProductId === null ? "Create" : "Update"}
-                  </Button>
-                  {editingProductId !== null ? (
-                    <Button type="button" variant="outline" onClick={resetForm}>
-                      Cancel
-                    </Button>
-                  ) : null}
-                </div>
-              </form>
-              {errorMessage ? (
-                <p className="mt-3 text-sm text-destructive" role="alert">
-                  {errorMessage}
-                </p>
-              ) : null}
-            </CardContent>
-          </Card>
+    <div className="mx-auto w-full space-y-4 p-6">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-semibold">Products</h1>
+          <p className="text-sm text-muted-foreground">Manage your product catalog</p>
+        </div>
+        <Button onClick={openCreateModal}><PlusIcon /> Add Product</Button>
+      </div>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Products</CardTitle>
-            </CardHeader>
-            <CardContent className="overflow-x-auto">
-              <table className="w-full border-collapse text-sm">
-                <thead>
-                  <tr className="border-b text-left">
-                    <th className="p-2 font-medium">#</th>
-                    <th className="p-2 font-medium">Name</th>
-                    <th className="p-2 font-medium">Category</th>
-                    <th className="p-2 font-medium">Price</th>
-                    <th className="p-2 font-medium">Description</th>
-                    <th className="p-2 font-medium">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {products.map((product, index) => (
-                    <tr key={product.id} className="border-b last:border-b-0">
-                      <td className="p-2">{index + 1}</td>
-                      <td className="p-2">{product.name}</td>
-                      <td className="p-2">{product.category.name}</td>
-                      <td className="p-2">
-                        Rp {product.price.toLocaleString("id-ID")}
-                      </td>
-                      <td className="p-2">{product.description}</td>
-                      <td className="p-2">
-                        <div className="flex gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => handleEdit(product)}
+      <div className="rounded-xl border bg-card">
+        {/* Toolbar */}
+        <div className="flex flex-wrap items-center gap-3 border-b p-4">
+          <Input
+            placeholder="Search all columns..."
+            value={globalFilter}
+            onChange={(e) => { setGlobalFilter(e.target.value); setPageIndex(0) }}
+            className="max-w-xs"
+          />
+          {selectedCount > 0 && (
+            <Button variant="destructive" size="sm" onClick={handleBulkDelete}>
+              <Trash2Icon /> Delete {selectedCount} selected
+            </Button>
+          )}
+          <div className="ml-auto flex items-center gap-2 text-sm text-muted-foreground">
+            Rows per page:
+            <select
+              className="h-8 rounded-md border border-input bg-transparent px-2 text-sm outline-none focus:border-ring"
+              value={pageSize}
+              onChange={(e) => { setPageSize(Number(e.target.value)); setPageIndex(0) }}
+            >
+              {PAGE_SIZE_OPTIONS.map((s) => <option key={s} value={s}>{s}</option>)}
+            </select>
+          </div>
+        </div>
+
+        {/* Table */}
+        <div className="overflow-x-auto">
+          <Table>
+            <TableHeader>
+              {table.getHeaderGroups().map((hg) => (
+                <Fragment key={hg.id}>
+                  <TableRow>
+                    {hg.headers.map((h) => (
+                      <TableHead key={h.id} className="whitespace-nowrap">
+                        {h.isPlaceholder ? null : (
+                          <div
+                            className={h.column.getCanSort() ? "flex cursor-pointer select-none items-center gap-1" : "flex items-center"}
+                            onClick={h.column.getCanSort() ? h.column.getToggleSortingHandler() : undefined}
                           >
-                            Edit
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="destructive"
-                            size="sm"
-                            onClick={() => handleDelete(product.id)}
-                          >
-                            Delete
-                          </Button>
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </CardContent>
-          </Card>
+                            {flexRender(h.column.columnDef.header, h.getContext())}
+                            {h.column.getCanSort() && <SortIcon direction={h.column.getIsSorted()} />}
+                          </div>
+                        )}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                  <TableRow className="bg-muted/30 hover:bg-muted/30">
+                    {hg.headers.map((h) => (
+                      <TableHead key={`${h.id}-f`} className="py-1.5">
+                        {h.column.getCanFilter() ? (
+                          <Input
+                            value={(h.column.getFilterValue() as string) ?? ""}
+                            onChange={(e) => h.column.setFilterValue(e.target.value)}
+                            placeholder="Filter…"
+                            className="h-7 text-xs"
+                          />
+                        ) : null}
+                      </TableHead>
+                    ))}
+                  </TableRow>
+                </Fragment>
+              ))}
+            </TableHeader>
+            <TableBody>
+              {isLoading ? (
+                Array.from({ length: 5 }).map((_, i) => (
+                  <TableRow key={i}>
+                    {columns.map((_, j) => (
+                      <TableCell key={j}><Skeleton className="h-4 w-full" /></TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : table.getRowModel().rows.length > 0 ? (
+                table.getRowModel().rows.map((row) => (
+                  <TableRow key={row.id} data-state={row.getIsSelected() ? "selected" : undefined}>
+                    {row.getVisibleCells().map((cell) => (
+                      <TableCell key={cell.id}>
+                        {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      </TableCell>
+                    ))}
+                  </TableRow>
+                ))
+              ) : (
+                <TableRow>
+                  <TableCell colSpan={columns.length} className="h-32 text-center text-muted-foreground">
+                    No products found.
+                  </TableCell>
+                </TableRow>
+              )}
+            </TableBody>
+          </Table>
+        </div>
+
+        {/* Pagination footer */}
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t px-4 py-3 text-sm text-muted-foreground">
+          <span>
+            {selectedCount > 0
+              ? `${selectedCount} of ${totalCount} row(s) selected`
+              : `${totalCount} row(s)`}
+          </span>
+          <div className="flex items-center gap-2">
+            <span>Page {pageIndex + 1} of {pageCount}</span>
+            <Button variant="outline" size="sm" onClick={() => table.previousPage()} disabled={!table.getCanPreviousPage()}>
+              Previous
+            </Button>
+            <Button variant="outline" size="sm" onClick={() => table.nextPage()} disabled={!table.getCanNextPage()}>
+              Next
+            </Button>
+          </div>
         </div>
       </div>
+
+      {/* Modal */}
+      <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{isEditMode ? "Edit Product" : "Add Product"}</DialogTitle>
+          </DialogHeader>
+          <form onSubmit={handleSubmit} className="space-y-4">
+            <div className="grid gap-2">
+              <Label htmlFor="form-name">Name *</Label>
+              <Input id="form-name" placeholder="Product name" value={formName} onChange={(e) => setFormName(e.target.value)} />
+            </div>
+            <div className="grid gap-2">
+              <Label>Category *</Label>
+              <CategoryCombobox categories={categories} value={formCategoryId} onChange={setFormCategoryId} onAddCategory={handleAddCategory} />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="form-price">Price (Rp) *</Label>
+              <CurrencyInput id="form-price" rawValue={formPrice} onRawChange={setFormPrice} />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="form-description">Description</Label>
+              <Input id="form-description" placeholder="Optional description" value={formDescription} onChange={(e) => setFormDescription(e.target.value)} />
+            </div>
+            {formError && <p className="text-sm text-destructive" role="alert">{formError}</p>}
+            <DialogFooter>
+              <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
+              <Button type="submit">{isEditMode ? "Update" : "Create"}</Button>
+            </DialogFooter>
+          </form>
+        </DialogContent>
+      </Dialog>
     </div>
   )
 }
