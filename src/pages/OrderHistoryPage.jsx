@@ -6,7 +6,7 @@ export default function OrderHistoryPage() {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const res = await fetch('http://localhost:3000/orders', {
+      const res = await fetch('http://localhost:3000/api/orders', {
         headers: {
           'Authorization': `Bearer ${localStorage.token}`,
         },
@@ -18,7 +18,7 @@ export default function OrderHistoryPage() {
   }, [])
 
   return (
-    <div className="max-w-md mx-auto p-4">
+    <div className="max-w-lg mx-auto p-4">
       <OrderHistory orders={orders} />
     </div>
   )

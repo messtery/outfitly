@@ -35,6 +35,55 @@ export const login = async (req, res) => {
   }
 };
 
+export const updateMe = async (req, res) => {
+  try {
+    const { name, email } = req.body;
+    if (!name?.trim() && !email?.trim()) {
+      return res.status(400).json({ message: 'At least one field is required' });
+    }
+
+    const customer = await Customer.findByPk(req.user.id);
+    if (!customer) return res.status(404).json({ message: 'Customer not found' });
+
+    const updates = {};
+    if (name?.trim()) updates.name = name.trim();
+    if (email?.trim()) updates.email = email.trim();
+
+    await customer.update(updates);
+
+    return res.status(200).json({
+      message: 'Profile updated',
+      customer: { id: customer.id, name: customer.name, email: customer.email },
+    });
+  } catch (error) {
+    if (error.name === 'SequelizeUniqueConstraintError') {
+      return res.status(400).json({ message: 'Email already in use' });
+    }
+    return res.status(500).json({ message: 'Failed to update profile' });
+  }
+};
+
+export const changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: 'Current and new password are required' });
+    }
+
+    const customer = await Customer.findByPk(req.user.id);
+    if (!customer) return res.status(404).json({ message: 'Customer not found' });
+
+    const isValid = await bcrypt.compare(currentPassword, customer.password);
+    if (!isValid) return res.status(400).json({ message: 'Current password is incorrect' });
+
+    await customer.update({ password: await bcrypt.hash(newPassword, 10) });
+
+    return res.status(200).json({ message: 'Password changed successfully' });
+  } catch (error) {
+    return res.status(500).json({ message: 'Failed to change password' });
+  }
+};
+
 export const register = async (req, res) => {
   try {
     const { name, email, password } = req.body;

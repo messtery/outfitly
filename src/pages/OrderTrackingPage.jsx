@@ -10,7 +10,7 @@ export default function OrderTrackingPage() {
   const [order, setOrder] = useState(null)
 
   useEffect(() => {
-    fetch(`http://localhost:3000/orders/${id}`, {
+    fetch(`http://localhost:3000/api/orders/${id}`, {
       headers: {
         'Authorization': `Bearer ${localStorage.token}`,
       },

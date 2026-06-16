@@ -38,7 +38,7 @@ export default function AIChatFAB() {
   const navigate = useNavigate()
 
   const createChat = (message: string) => {
-    fetch(`http://localhost:3000/chat`, {
+    fetch(`http://localhost:3000/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

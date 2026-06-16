@@ -18,6 +18,7 @@ const pageTitles = {
   "/profile": "Profile",
   "/checkout": "Checkout",
   "/orderhistory": "Order History",
+  "/account": "Account Settings",
 }
 
 function getTitle(pathname) {

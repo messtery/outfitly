@@ -43,7 +43,7 @@ type Customer = { id: number; name: string; email: string }
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
 const FILTERABLE_COLS = ["email", "name"] as const
-const API = "http://localhost:3000"
+const API = "http://localhost:3000/api"
 
 function SortIcon({ direction }: { direction: "asc" | "desc" | false }) {
   if (direction === "asc") return <ChevronUpIcon className="size-3.5" />

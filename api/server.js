@@ -18,6 +18,8 @@ import {
 import {
   login,
   register,
+  updateMe,
+  changePassword,
 } from './controllers/authController.js'
 import { login as adminLogin } from './controllers/admin/adminAuthController.js';
 import cors from 'cors';
@@ -34,25 +36,31 @@ app.use((req, res, next) => {
   next();
 });
 
-app.post('/admin/auth/login', adminLogin);
-app.use('/admin', adminAuthMiddleware, adminRoutes);
+const api = express.Router();
 
-app.post('/auth/login', login)
-app.post('/auth/register', register)
+api.post('/admin/auth/login', adminLogin);
+api.use('/admin', adminAuthMiddleware, adminRoutes);
 
-app.use('/customers', customerRoutes);
-app.use('/orders', orderRoutes);
-app.use('/orders/:orderId/items', orderItemRoutes);
-app.use('/api', categoryRoutes);
-app.use('/products', productRoutes);
-app.use('/chat', chatRoutes);
+api.post('/auth/login', login);
+api.post('/auth/register', register);
+api.patch('/auth/me', authMiddleware, updateMe);
+api.patch('/auth/password', authMiddleware, changePassword);
 
-app.get('/cart-items', authMiddleware, getCartItems);
-app.post('/cart-items', authMiddleware, createCart);
-app.put('/cart-items', authMiddleware, updateCartItem);
-app.delete('/cart-items/:id', authMiddleware, removeCartItem);
+api.use('/customers', customerRoutes);
+api.use('/orders', orderRoutes);
+api.use('/orders/:orderId/items', orderItemRoutes);
+api.use(categoryRoutes);
+api.use('/products', productRoutes);
+api.use('/chat', chatRoutes);
 
-app.post('/checkout', authMiddleware, checkout)
+api.get('/cart-items', authMiddleware, getCartItems);
+api.post('/cart-items', authMiddleware, createCart);
+api.put('/cart-items', authMiddleware, updateCartItem);
+api.delete('/cart-items/:id', authMiddleware, removeCartItem);
+
+api.post('/checkout', authMiddleware, checkout);
+
+app.use('/api', api);
 
 app.get('/', (req, res) => {
   res.json({

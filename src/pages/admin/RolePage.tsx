@@ -44,7 +44,7 @@ type Role = { id: number; name: string; description: string | null; permissions:
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
 const FILTERABLE_COLS = ["name", "description"] as const
-const API = "http://localhost:3000"
+const API = "http://localhost:3000/api"
 
 const PERMISSION_GROUPS: { group: string; items: { key: string; label: string }[] }[] = [
   {

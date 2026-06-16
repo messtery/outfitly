@@ -2,8 +2,11 @@ import Cart from "../components/Cart"
 
 export default function CartPage() {
   return (
-    <div className="p-4">
-      <Cart />
+    <div className="min-h-screen bg-muted/40">
+      <div className="max-w-5xl mx-auto px-6 py-8">
+        <h1 className="text-2xl font-bold mb-6">Shopping Cart</h1>
+        <Cart />
+      </div>
     </div>
   )
 }
