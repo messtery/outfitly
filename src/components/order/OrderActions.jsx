@@ -37,7 +37,7 @@ export default function OrderActions({ mode = "tracking", onCancel, onRepeat, it
     return (
       <div className="flex gap-2">
         <Button variant="outline" size="sm" onClick={handleRepeat} disabled={loading}>
-          {loading ? "Memuat..." : "Repeat Order"}
+          {loading ? "Loading..." : "Repeat Order"}
         </Button>
       </div>
     )
