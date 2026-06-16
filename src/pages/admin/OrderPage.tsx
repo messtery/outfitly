@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react"
-
+import { adminFetch } from "@/lib/adminFetch"
 import { useSearchParams } from "react-router-dom"
 import {
   flexRender,
@@ -144,7 +144,7 @@ export default function OrderPage() {
   useEffect(() => {
     let cancelled = false
     setIsLoading(true)
-    fetch(`${API}/admin/orders?${buildParams()}`)
+    adminFetch(`${API}/admin/orders?${buildParams()}`)
       .then((r) => r.json())
       .then((json) => {
         if (cancelled) return
@@ -175,7 +175,7 @@ export default function OrderPage() {
 
   const refetch = () => {
     setIsLoading(true)
-    fetch(`${API}/admin/orders?${buildParams()}`)
+    adminFetch(`${API}/admin/orders?${buildParams()}`)
       .then((r) => r.json())
       .then((json) => { setOrders(json.data ?? []); setTotalCount(json.meta?.total ?? 0) })
       .catch(() => {})
@@ -184,7 +184,7 @@ export default function OrderPage() {
 
   const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
-    await fetch(`${API}/admin/orders/${editingId}`, {
+    await adminFetch(`${API}/admin/orders/${editingId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ paymentStatus: formStatus }),
@@ -194,14 +194,14 @@ export default function OrderPage() {
   }
 
   const handleDelete = async (id: number) => {
-    await fetch(`${API}/admin/orders/${id}`, { method: "DELETE" })
+    await adminFetch(`${API}/admin/orders/${id}`, { method: "DELETE" })
     refetch()
   }
 
   const handleBulkDelete = async () => {
     const ids = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number)
     if (ids.length === 0) return
-    await fetch(`${API}/admin/orders/bulk`, {
+    await adminFetch(`${API}/admin/orders/bulk`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),

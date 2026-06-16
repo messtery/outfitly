@@ -1,5 +1,6 @@
 import { Fragment, useEffect, useState } from "react"
 import type { ComponentProps } from "react"
+import { adminFetch } from "@/lib/adminFetch"
 import { useSearchParams } from "react-router-dom"
 import {
   flexRender,
@@ -237,7 +238,7 @@ export default function ProductPage() {
       debouncedColumnFilters.forEach((f) => {
         if (f.value) params.set(f.id === "category" ? "category" : String(f.id), String(f.value))
       })
-      const res = await fetch(`${API}/admin/products?${params}`)
+      const res = await adminFetch(`${API}/admin/products?${params}`)
       const json = await res.json()
       setProducts(json.data ?? [])
       setTotalCount(json.meta?.total ?? 0)
@@ -272,7 +273,7 @@ export default function ProductPage() {
     debouncedColumnFilters.forEach((f) => {
       if (f.value) params.set(String(f.id), String(f.value))
     })
-    fetch(`${API}/admin/products?${params}`)
+    adminFetch(`${API}/admin/products?${params}`)
       .then((r) => r.json())
       .then((json) => {
         if (cancelled) return
@@ -356,7 +357,7 @@ export default function ProductPage() {
     body.append("price", String(parsedPrice))
     body.append("description", formDescription.trim())
     if (formImageFile) body.append("image", formImageFile)
-    await fetch(
+    await adminFetch(
       isEditMode ? `${API}/admin/products/${editingId}` : `${API}/admin/products`,
       { method: isEditMode ? "PUT" : "POST", body }
     )
@@ -365,14 +366,14 @@ export default function ProductPage() {
   }
 
   const handleDelete = async (id: number) => {
-    await fetch(`${API}/admin/products/${id}`, { method: "DELETE" })
+    await adminFetch(`${API}/admin/products/${id}`, { method: "DELETE" })
     fetchProducts()
   }
 
   const handleBulkDelete = async () => {
     const ids = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number)
     if (ids.length === 0) return
-    await fetch(`${API}/admin/products/bulk`, {
+    await adminFetch(`${API}/admin/products/bulk`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),

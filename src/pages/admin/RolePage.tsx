@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from "react"
+import { adminFetch } from "@/lib/adminFetch"
 import { useSearchParams } from "react-router-dom"
 import {
   flexRender,
@@ -69,6 +70,7 @@ const PERMISSION_GROUPS: { group: string; items: { key: string; label: string }[
     group: "Orders",
     items: [
       { key: "orders.view", label: "View" },
+      { key: "orders.create", label: "Create" },
       { key: "orders.update", label: "Update" },
       { key: "orders.delete", label: "Delete" },
     ],
@@ -77,6 +79,7 @@ const PERMISSION_GROUPS: { group: string; items: { key: string; label: string }[
     group: "Customers",
     items: [
       { key: "customers.view", label: "View" },
+      { key: "customers.create", label: "Create" },
       { key: "customers.update", label: "Update" },
       { key: "customers.delete", label: "Delete" },
     ],
@@ -178,7 +181,7 @@ export default function RolePage() {
   useEffect(() => {
     let cancelled = false
     setIsLoading(true)
-    fetch(`${API}/admin/roles?${buildParams()}`)
+    adminFetch(`${API}/admin/roles?${buildParams()}`)
       .then((r) => r.json())
       .then((json) => {
         if (cancelled) return
@@ -241,7 +244,7 @@ export default function RolePage() {
 
   const refetch = () => {
     setIsLoading(true)
-    fetch(`${API}/admin/roles?${buildParams()}`)
+    adminFetch(`${API}/admin/roles?${buildParams()}`)
       .then((r) => r.json())
       .then((json) => { setRoles(json.data ?? []); setTotalCount(json.meta?.total ?? 0) })
       .catch(() => {})
@@ -273,14 +276,14 @@ export default function RolePage() {
   }
 
   const handleDelete = async (id: number) => {
-    await fetch(`${API}/admin/roles/${id}`, { method: "DELETE" })
+    await adminFetch(`${API}/admin/roles/${id}`, { method: "DELETE" })
     refetch()
   }
 
   const handleBulkDelete = async () => {
     const ids = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number)
     if (ids.length === 0) return
-    await fetch(`${API}/admin/roles/bulk`, {
+    await adminFetch(`${API}/admin/roles/bulk`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),

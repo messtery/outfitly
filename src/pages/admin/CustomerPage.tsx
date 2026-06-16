@@ -1,5 +1,5 @@
 import { Fragment, useEffect, useState } from "react"
-
+import { adminFetch } from "@/lib/adminFetch"
 import { useSearchParams } from "react-router-dom"
 import {
   flexRender,
@@ -123,7 +123,7 @@ export default function CustomerPage() {
   useEffect(() => {
     let cancelled = false
     setIsLoading(true)
-    fetch(`${API}/admin/customers?${buildParams()}`)
+    adminFetch(`${API}/admin/customers?${buildParams()}`)
       .then((r) => r.json())
       .then((json) => {
         if (cancelled) return
@@ -156,7 +156,7 @@ export default function CustomerPage() {
 
   const refetch = () => {
     setIsLoading(true)
-    fetch(`${API}/admin/customers?${buildParams()}`)
+    adminFetch(`${API}/admin/customers?${buildParams()}`)
       .then((r) => r.json())
       .then((json) => { setCustomers(json.data ?? []); setTotalCount(json.meta?.total ?? 0) })
       .catch(() => {})
@@ -166,7 +166,7 @@ export default function CustomerPage() {
   const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
     if (!formName.trim() || !formEmail.trim()) { setFormError("Name and email are required."); return }
-    await fetch(`${API}/admin/customers/${editingId}`, {
+    await adminFetch(`${API}/admin/customers/${editingId}`, {
       method: "PATCH",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name: formName.trim(), email: formEmail.trim() }),
@@ -176,14 +176,14 @@ export default function CustomerPage() {
   }
 
   const handleDelete = async (id: number) => {
-    await fetch(`${API}/admin/customers/${id}`, { method: "DELETE" })
+    await adminFetch(`${API}/admin/customers/${id}`, { method: "DELETE" })
     refetch()
   }
 
   const handleBulkDelete = async () => {
     const ids = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number)
     if (ids.length === 0) return
-    await fetch(`${API}/admin/customers/bulk`, {
+    await adminFetch(`${API}/admin/customers/bulk`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),
