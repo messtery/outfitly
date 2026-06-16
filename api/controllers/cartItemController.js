@@ -14,12 +14,20 @@ export const create = async (req, res) => {
 
     const product = await Product.findByPk(productId)
 
-    const cartItem = await CartItem.create({
-      cartId: cart.id,
-      productId: product.id,
-      qty: qty,
-      price: product.price,
+    const [cartItem, created] = await CartItem.findOrCreate({
+      where: {
+        cartId: cart.id,
+        productId: product.id,
+      },
+      defaults: {
+        qty,
+        price: product.price,
+      },
     })
+
+    if (!created) {
+      await cartItem.increment('qty', { by: qty })
+    }
 
     res.status(201).json({
       message: 'Cart created successfully',
