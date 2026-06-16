@@ -1,5 +1,4 @@
 import { Fragment, useEffect, useState } from "react"
-
 import { useSearchParams } from "react-router-dom"
 import {
   flexRender,
@@ -11,6 +10,7 @@ import {
   type SortingState,
 } from "@tanstack/react-table"
 import { useDebounce } from "@/hooks/useDebounce"
+import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Checkbox } from "@/components/ui/checkbox"
 import {
@@ -22,6 +22,13 @@ import {
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select"
 import { Skeleton } from "@/components/ui/skeleton"
 import {
   Table,
@@ -36,13 +43,15 @@ import {
   ChevronUpIcon,
   ChevronsUpDownIcon,
   PencilIcon,
+  PlusIcon,
   Trash2Icon,
 } from "lucide-react"
 
-type Customer = { id: number; name: string; email: string }
+type RoleOption = { id: number; name: string }
+type User = { id: number; name: string; email: string; role: RoleOption | null }
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
-const FILTERABLE_COLS = ["email", "name"] as const
+const FILTERABLE_COLS = ["name", "email", "role"] as const
 const API = "http://localhost:3000"
 
 function SortIcon({ direction }: { direction: "asc" | "desc" | false }) {
@@ -51,7 +60,7 @@ function SortIcon({ direction }: { direction: "asc" | "desc" | false }) {
   return <ChevronsUpDownIcon className="size-3.5 text-muted-foreground/60" />
 }
 
-export default function CustomerPage() {
+export default function UserPage() {
   const [searchParams, setSearchParams] = useSearchParams()
 
   const [globalFilter, setGlobalFilter] = useState<string>(
@@ -99,16 +108,21 @@ export default function CustomerPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalFilter, columnFilters, sorting, pageIndex, pageSize])
 
-  const [customers, setCustomers] = useState<Customer[]>([])
+  const [users, setUsers] = useState<User[]>([])
   const [totalCount, setTotalCount] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [roleOptions, setRoleOptions] = useState<RoleOption[]>([])
+
+  useEffect(() => {
+    fetch(`${API}/admin/roles/all`)
+      .then((r) => r.json())
+      .then((json) => setRoleOptions(json.data ?? []))
+      .catch(() => {})
+  }, [])
 
   const buildParams = () => {
-    const params = new URLSearchParams({
-      page: String(pageIndex + 1),
-      limit: String(pageSize),
-    })
+    const params = new URLSearchParams({ page: String(pageIndex + 1), limit: String(pageSize) })
     if (debouncedGlobalFilter) params.set("q", debouncedGlobalFilter)
     if (sorting.length > 0) {
       params.set("sort", sorting[0].id)
@@ -123,11 +137,11 @@ export default function CustomerPage() {
   useEffect(() => {
     let cancelled = false
     setIsLoading(true)
-    fetch(`${API}/admin/customers?${buildParams()}`)
+    fetch(`${API}/admin/users?${buildParams()}`)
       .then((r) => r.json())
       .then((json) => {
         if (cancelled) return
-        setCustomers(json.data ?? [])
+        setUsers(json.data ?? [])
         setTotalCount(json.meta?.total ?? 0)
       })
       .catch(() => {})
@@ -144,21 +158,31 @@ export default function CustomerPage() {
   }, [totalCount, isLoading])
 
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const [isEditMode, setIsEditMode] = useState(false)
   const [editingId, setEditingId] = useState<number | null>(null)
   const [formName, setFormName] = useState("")
   const [formEmail, setFormEmail] = useState("")
+  const [formPassword, setFormPassword] = useState("")
+  const [formRoleId, setFormRoleId] = useState<string>("none")
   const [formError, setFormError] = useState("")
 
-  const openEditModal = (c: Customer) => {
-    setEditingId(c.id); setFormName(c.name); setFormEmail(c.email); setFormError("")
+  const openCreateModal = () => {
+    setIsEditMode(false); setEditingId(null)
+    setFormName(""); setFormEmail(""); setFormPassword(""); setFormRoleId("none"); setFormError("")
+    setIsModalOpen(true)
+  }
+  const openEditModal = (u: User) => {
+    setIsEditMode(true); setEditingId(u.id)
+    setFormName(u.name); setFormEmail(u.email); setFormPassword("")
+    setFormRoleId(u.role ? String(u.role.id) : "none"); setFormError("")
     setIsModalOpen(true)
   }
 
   const refetch = () => {
     setIsLoading(true)
-    fetch(`${API}/admin/customers?${buildParams()}`)
+    fetch(`${API}/admin/users?${buildParams()}`)
       .then((r) => r.json())
-      .then((json) => { setCustomers(json.data ?? []); setTotalCount(json.meta?.total ?? 0) })
+      .then((json) => { setUsers(json.data ?? []); setTotalCount(json.meta?.total ?? 0) })
       .catch(() => {})
       .finally(() => setIsLoading(false))
   }
@@ -166,24 +190,42 @@ export default function CustomerPage() {
   const handleSubmit = async (e: { preventDefault(): void }) => {
     e.preventDefault()
     if (!formName.trim() || !formEmail.trim()) { setFormError("Name and email are required."); return }
-    await fetch(`${API}/admin/customers/${editingId}`, {
-      method: "PATCH",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name: formName.trim(), email: formEmail.trim() }),
-    })
+    if (!isEditMode && !formPassword) { setFormError("Password is required."); return }
+
+    const body: Record<string, unknown> = {
+      name: formName.trim(),
+      email: formEmail.trim(),
+      roleId: formRoleId !== "none" ? Number(formRoleId) : null,
+    }
+    if (formPassword) body.password = formPassword
+    if (!isEditMode) body.password = formPassword
+
+    const res = await fetch(
+      isEditMode ? `${API}/admin/users/${editingId}` : `${API}/admin/users`,
+      {
+        method: isEditMode ? "PATCH" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      }
+    )
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({}))
+      setFormError(data.message ?? "Something went wrong.")
+      return
+    }
     setIsModalOpen(false)
     refetch()
   }
 
   const handleDelete = async (id: number) => {
-    await fetch(`${API}/admin/customers/${id}`, { method: "DELETE" })
+    await fetch(`${API}/admin/users/${id}`, { method: "DELETE" })
     refetch()
   }
 
   const handleBulkDelete = async () => {
     const ids = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number)
     if (ids.length === 0) return
-    await fetch(`${API}/admin/customers/bulk`, {
+    await fetch(`${API}/admin/users/bulk`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),
@@ -192,7 +234,7 @@ export default function CustomerPage() {
     refetch()
   }
 
-  const columns: ColumnDef<Customer>[] = [
+  const columns: ColumnDef<User>[] = [
     {
       id: "select",
       header: ({ table }) => (
@@ -208,14 +250,22 @@ export default function CustomerPage() {
       enableSorting: false,
       enableColumnFilter: false,
     },
-    {
-      accessorKey: "id",
-      header: "ID",
-      enableSorting: true,
-      enableColumnFilter: false,
-    },
-    { accessorKey: "email", header: "Email", enableSorting: true, enableColumnFilter: true },
+    { accessorKey: "id", header: "ID", enableSorting: true, enableColumnFilter: false },
     { accessorKey: "name", header: "Name", enableSorting: true, enableColumnFilter: true },
+    { accessorKey: "email", header: "Email", enableSorting: true, enableColumnFilter: true },
+    {
+      id: "role",
+      header: "Role",
+      accessorFn: (row) => row.role?.name ?? "",
+      enableSorting: true,
+      enableColumnFilter: true,
+      cell: ({ row }) =>
+        row.original.role ? (
+          <Badge variant="secondary">{row.original.role.name}</Badge>
+        ) : (
+          <span className="text-muted-foreground/50">—</span>
+        ),
+    },
     {
       id: "actions",
       header: "",
@@ -237,7 +287,7 @@ export default function CustomerPage() {
   const pageCount = Math.max(1, Math.ceil(totalCount / pageSize))
 
   const table = useReactTable({
-    data: customers,
+    data: users,
     columns,
     getRowId: (row) => String(row.id),
     state: { sorting, columnFilters, globalFilter, pagination: { pageIndex, pageSize }, rowSelection },
@@ -264,15 +314,16 @@ export default function CustomerPage() {
     <div className="mx-auto w-full space-y-4 p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">Customers</h1>
-          <p className="text-sm text-muted-foreground">View and manage customers</p>
+          <h1 className="text-2xl font-semibold">Users</h1>
+          <p className="text-sm text-muted-foreground">Manage system users and their roles</p>
         </div>
+        <Button onClick={openCreateModal}><PlusIcon /> Add User</Button>
       </div>
 
       <div className="rounded-xl border bg-card">
         <div className="flex flex-wrap items-center gap-3 border-b p-4">
           <Input
-            placeholder="Search customers..."
+            placeholder="Search users..."
             value={globalFilter}
             onChange={(e) => { setGlobalFilter(e.target.value); setPageIndex(0) }}
             className="max-w-xs"
@@ -349,7 +400,7 @@ export default function CustomerPage() {
               ) : (
                 <TableRow>
                   <TableCell colSpan={columns.length} className="h-32 text-center text-muted-foreground">
-                    No customers found.
+                    No users found.
                   </TableCell>
                 </TableRow>
               )}
@@ -370,7 +421,7 @@ export default function CustomerPage() {
       <Dialog open={isModalOpen} onOpenChange={setIsModalOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Edit Customer</DialogTitle>
+            <DialogTitle>{isEditMode ? "Edit User" : "Add User"}</DialogTitle>
           </DialogHeader>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-2">
@@ -381,10 +432,36 @@ export default function CustomerPage() {
               <Label htmlFor="form-email">Email *</Label>
               <Input id="form-email" type="email" value={formEmail} onChange={(e) => setFormEmail(e.target.value)} />
             </div>
+            <div className="grid gap-2">
+              <Label htmlFor="form-password">
+                Password {isEditMode ? <span className="text-muted-foreground font-normal">(leave blank to keep)</span> : "*"}
+              </Label>
+              <Input
+                id="form-password"
+                type="password"
+                value={formPassword}
+                onChange={(e) => setFormPassword(e.target.value)}
+                placeholder={isEditMode ? "••••••••" : ""}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="form-role">Role</Label>
+              <Select value={formRoleId} onValueChange={setFormRoleId}>
+                <SelectTrigger id="form-role" className="w-full">
+                  <SelectValue placeholder="No role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="none">No role</SelectItem>
+                  {roleOptions.map((r) => (
+                    <SelectItem key={r.id} value={String(r.id)}>{r.name}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
             {formError && <p className="text-sm text-destructive" role="alert">{formError}</p>}
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setIsModalOpen(false)}>Cancel</Button>
-              <Button type="submit">Update</Button>
+              <Button type="submit">{isEditMode ? "Update" : "Create"}</Button>
             </DialogFooter>
           </form>
         </DialogContent>

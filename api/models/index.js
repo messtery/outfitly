@@ -10,6 +10,8 @@ import OrderItem from './orderitem.js';
 import Order from './order.js';
 import Cart from './cart.js';
 import CartItem from './cartitem.js';
+import Role from './role.js';
+import User from './user.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);

@@ -1,5 +1,6 @@
 import express from 'express';
 import authMiddleware from './middlewares/authMiddleware.js';
+import adminAuthMiddleware from './middlewares/adminAuthMiddleware.js';
 import customerRoutes from './routes/customerRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import orderItemRoutes from './routes/orderItemRoutes.js';
@@ -18,6 +19,7 @@ import {
   login,
   register,
 } from './controllers/authController.js'
+import { login as adminLogin } from './controllers/admin/adminAuthController.js';
 import cors from 'cors';
 
 const app = express();
@@ -32,7 +34,8 @@ app.use((req, res, next) => {
   next();
 });
 
-app.use('/admin', adminRoutes)
+app.post('/admin/auth/login', adminLogin);
+app.use('/admin', adminAuthMiddleware, adminRoutes);
 
 app.post('/auth/login', login)
 app.post('/auth/register', register)
