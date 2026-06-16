@@ -1,4 +1,4 @@
-import Xendit from 'xendit-node';
+import { Xendit } from 'xendit-node';
 import Order from '../models/order.js';
 import Customer from '../models/customer.js';
 
