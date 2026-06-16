@@ -19,8 +19,9 @@ type Message = {
   id: number
   role: "user" | "assistant"
   text: string
-  type?: "text" | "action"
+  type?: "text" | "action" | "error"
   itemId?: string
+  retryText?: string
 }
 
 export default function AIChatFAB() {
@@ -34,17 +35,19 @@ export default function AIChatFAB() {
   const [messages, setMessages] = useState<Message[]>([
     { id: 1, role: "assistant", text: "Hi! I'm your AI assistant. How can I help you today?" },
   ])
+  const [isLoading, setIsLoading] = useState(false)
   const messagesEndRef = useRef(null)
   const navigate = useNavigate()
 
-  const createChat = (message: string) => {
+  const createChat = (text: string) => {
+    setIsLoading(true)
     fetch(`http://localhost:3000/api/chat`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        message,
+        message: text,
       }),
     })
       .then((res) => res.json())
@@ -52,13 +55,22 @@ export default function AIChatFAB() {
         setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: res.data.message }])
         renderActions(res.data.actions)
       })
+      .catch(() => {
+        setMessages((prev) => [
+          ...prev,
+          { id: nextId++, role: "assistant", type: "error", text: "Something went wrong.", retryText: text },
+        ])
+      })
+      .finally(() => {
+        setIsLoading(false)
+      })
   }
 
   useEffect(() => {
     if (isOpen && messagesEndRef.current) {
       messagesEndRef.current.scrollIntoView({ behavior: "smooth" })
     }
-  }, [messages, isOpen])
+  }, [messages, isOpen, isLoading])
 
   const handleSend = () => {
     const trimmed = message.trim()
@@ -81,6 +93,11 @@ export default function AIChatFAB() {
     actions.map((action) => {
       setMessages((prev) => [...prev, { id: nextId++, role: "assistant", text: action.label, type: "action", itemId: action.item_id }])
     })
+  }
+
+  const handleRetry = (retryText: string, errorMsgId: number) => {
+    setMessages((prev) => prev.filter((m) => m.id !== errorMsgId))
+    createChat(retryText)
   }
 
   const handleSuggestionClick = (e: React.MouseEvent<HTMLAnchorElement>, productId: string) => {
@@ -140,6 +157,20 @@ export default function AIChatFAB() {
                       </a>
                     </Item>
                 )
+                : msg.type === "error"
+                ? (
+                  <div key={msg.id} className="flex justify-start">
+                    <div className="max-w-[75%] rounded-2xl px-3 py-2 text-sm bg-gray-100 dark:bg-gray-800 text-gray-800 dark:text-gray-200 rounded-bl-sm">
+                      Something went wrong,{" "}
+                      <button
+                        onClick={() => handleRetry(msg.retryText!, msg.id)}
+                        className="text-violet-500 underline hover:text-violet-600 hover:cursor-pointer"
+                      >
+                        try again
+                      </button>
+                    </div>
+                  </div>
+                )
                 : (
                   <div key={msg.id} className={`flex ${msg.role === "user" ? "justify-end" : "justify-start"}`}>
                     <div
@@ -153,6 +184,18 @@ export default function AIChatFAB() {
                   </div>
                 )
             )}
+
+            {/* Loading bubble */}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-gray-100 dark:bg-gray-800 rounded-2xl rounded-bl-sm px-4 py-3 flex items-center gap-1">
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce [animation-delay:0ms]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce [animation-delay:150ms]" />
+                  <span className="w-1.5 h-1.5 rounded-full bg-gray-400 dark:bg-gray-500 animate-bounce [animation-delay:300ms]" />
+                </div>
+              </div>
+            )}
+
             <div ref={messagesEndRef} />
           </div>
 
@@ -168,7 +211,7 @@ export default function AIChatFAB() {
             />
             <button
               onClick={handleSend}
-              disabled={!message.trim()}
+              disabled={!message.trim() || isLoading}
               className="w-8 h-8 flex items-center justify-center rounded-full bg-gradient-to-br from-violet-500 to-blue-500 text-white disabled:opacity-40 hover:cursor-pointer transition-opacity"
               aria-label="Send message"
             >
