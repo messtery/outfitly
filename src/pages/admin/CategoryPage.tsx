@@ -44,7 +44,7 @@ type Category = { id: number; name: string }
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
 const FILTERABLE_COLS = ["name"] as const
-const API = "http://localhost:3000"
+const API = "http://localhost:3000/api"
 
 function SortIcon({ direction }: { direction: "asc" | "desc" | false }) {
   if (direction === "asc") return <ChevronUpIcon className="size-3.5" />
@@ -118,7 +118,7 @@ export default function CategoryPage() {
     debouncedColumnFilters.forEach((f) => {
       if (f.value) params.set(String(f.id), String(f.value))
     })
-    return fetch(`${API}/api/categories?${params}`)
+    return fetch(`${API}/categories?${params}`)
   }
 
   useEffect(() => {
@@ -172,7 +172,7 @@ export default function CategoryPage() {
     e.preventDefault()
     if (!formName.trim()) { setFormError("Name is required."); return }
     await fetch(
-      isEditMode ? `${API}/api/categories/${editingId}` : `${API}/api/categories`,
+      isEditMode ? `${API}/categories/${editingId}` : `${API}/categories`,
       {
         method: isEditMode ? "PATCH" : "POST",
         headers: { "Content-Type": "application/json" },
@@ -184,14 +184,14 @@ export default function CategoryPage() {
   }
 
   const handleDelete = async (id: number) => {
-    await fetch(`${API}/api/categories/${id}`, { method: "DELETE" })
+    await fetch(`${API}/categories/${id}`, { method: "DELETE" })
     refetch()
   }
 
   const handleBulkDelete = async () => {
     const ids = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number)
     if (ids.length === 0) return
-    await fetch(`${API}/api/categories/bulk`, {
+    await fetch(`${API}/categories/bulk`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),

@@ -8,7 +8,7 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Separator } from '@/components/ui/separator'
 
-const API = 'http://localhost:3000'
+const API = 'http://localhost:3000/api'
 
 function getInitials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean)

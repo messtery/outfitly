@@ -57,7 +57,7 @@ type Product = {
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
 const FILTERABLE_COLS = ["name", "category", "price", "description"] as const
-const API = "http://localhost:3000"
+const API = "http://localhost:3000/api"
 
 // ─── Currency Input ───────────────────────────────────────────────────────────
 
@@ -246,7 +246,7 @@ export default function ProductPage() {
   }
 
   const fetchCategories = async () => {
-    const res = await fetch(`${API}/api/categories?limit=1000`)
+    const res = await fetch(`${API}/categories?limit=1000`)
     const json = await res.json()
     setCategories((json.data as Category[]) ?? [])
   }
@@ -320,7 +320,7 @@ export default function ProductPage() {
   // ── Category quick-add ──────────────────────────────────────────────────────
 
   const handleAddCategory = async (name: string): Promise<Category> => {
-    const res = await fetch(`${API}/api/categories`, {
+    const res = await fetch(`${API}/categories`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ name }),

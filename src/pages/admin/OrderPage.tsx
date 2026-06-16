@@ -50,7 +50,7 @@ type Order = {
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
 const FILTERABLE_COLS = ["customer", "total", "paymentStatus"] as const
 const STATUS_OPTIONS = ["pending", "paid", "failed"] as const
-const API = "http://localhost:3000"
+const API = "http://localhost:3000/api"
 
 function StatusBadge({ status }: { status: string }) {
   const cls =

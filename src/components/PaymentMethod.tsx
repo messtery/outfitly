@@ -2,12 +2,13 @@ import { useState } from "react"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
 import { Button } from "@/components/ui/button"
+import { Card, CardHeader, CardContent, CardFooter } from "@/components/ui/card"
 import { useNavigate } from "react-router-dom"
 
 const dummyMethods = [
-    { id: 1, code: "gopay", name: "GoPay" },
-    { id: 2, code: "ovo", name: "OVO" },
-    { id: 3, code: "bank_transfer", name: "Bank Transfer" },
+    { id: 1, code: "cash", name: "Cash" },
+    { id: 2, code: "qris", name: "QRIS" },
+    { id: 3, code: "transfer", name: "Transfer" },
 ]
 
 export default function PaymentMethod() {
@@ -15,7 +16,7 @@ export default function PaymentMethod() {
     const navigate = useNavigate()
 
     const checkout = () => {
-        fetch('http://localhost:3000/checkout', {
+        fetch('http://localhost:3000/api/checkout', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -28,24 +29,40 @@ export default function PaymentMethod() {
             })
     }
 
-    const handleClick = () => {
-        checkout()
-    }
-
     return (
-        <div className="space-y-4 flex-col ">
-            <h2 className="text-lg font-semibold text-center">Pilih Metode Pembayaran</h2>
-            <RadioGroup value={selected} onValueChange={setSelected} className="flex flex-row justify-center">
-                {dummyMethods.map(m => (
-                    <div key={m.id} className="flex items-center space-x-2">
-                        <RadioGroupItem value={m.code} id={m.code} />
-                        <Label htmlFor={m.code}>{m.name}</Label>
-                    </div>
-                ))}
-            </RadioGroup>
-            <div className="flex justify-center">
-                <Button onClick={() => handleClick()}>Pay Now</Button>
-            </div>
-        </div>
+        <Card>
+            <CardHeader className="pb-3">
+                <h2 className="text-xl font-bold">Payment Method</h2>
+                <p className="text-sm text-muted-foreground">Select how you'd like to pay</p>
+            </CardHeader>
+            <CardContent>
+                <RadioGroup value={selected} onValueChange={setSelected} className="space-y-3">
+                    {dummyMethods.map(m => (
+                        <label
+                            key={m.id}
+                            htmlFor={m.code}
+                            className={`flex items-center gap-3 p-3 rounded-lg border cursor-pointer transition-colors ${
+                                selected === m.code
+                                    ? "border-primary bg-primary/5"
+                                    : "border-border hover:bg-muted/50"
+                            }`}
+                        >
+                            <RadioGroupItem value={m.code} id={m.code} />
+                            <Label htmlFor={m.code} className="cursor-pointer font-medium">{m.name}</Label>
+                        </label>
+                    ))}
+                </RadioGroup>
+            </CardContent>
+            <CardFooter>
+                <Button
+                    className="w-full"
+                    size="lg"
+                    disabled={!selected}
+                    onClick={checkout}
+                >
+                    Pay Now
+                </Button>
+            </CardFooter>
+        </Card>
     )
 }

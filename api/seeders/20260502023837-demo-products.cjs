@@ -3,180 +3,266 @@
 /** @type {import('sequelize-cli').Migration} */
 module.exports = {
   async up (queryInterface, Sequelize) {
-    /**
-     * Add seed commands here.
-     *
-     * Example:
-     * await queryInterface.bulkInsert('People', [{
-     *   name: 'John Doe',
-     *   isBetaMember: false
-     * }], {});
-    */
-
     await queryInterface.bulkInsert('products', [
+      // ── Food (categoryId: 1) ─────────────────────────────────────────
       {
-        name: 'Pizza',
-        description: 'Classic cheese pizza with tomato sauce and melted mozzarella',
-        price: 50_000,
+        name: 'Nasi Goreng Spesial',
+        description: 'Indonesian fried rice with egg, chicken, prawns, and aromatic spices — a satisfying all-day meal',
+        price: 22_000,
         categoryId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Burger',
-        description: 'Juicy beef burger with lettuce, tomato, and special sauce',
-        price: 30_000,
+        name: 'Mie Goreng Ayam',
+        description: 'Stir-fried egg noodles with chicken, vegetables, and savory kecap manis sauce',
+        price: 20_000,
         categoryId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Fried Chicken',
-        description: 'Crispy deep-fried chicken with savory seasoning',
+        name: 'Bakso Kuah',
+        description: 'Hearty beef meatball soup in a rich clear broth — perfect for rainy days',
+        price: 18_000,
+        categoryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Soto Ayam',
+        description: 'Warm and fragrant turmeric chicken soup with vermicelli, egg, and fresh herbs — a rainy day staple',
+        price: 20_000,
+        categoryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Bubur Ayam',
+        description: 'Silky rice porridge topped with shredded chicken, crispy shallots, and cakwe — great on cold mornings',
+        price: 15_000,
+        categoryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Mie Rebus Telur',
+        description: 'Soft noodles in spiced broth with boiled egg, tofu, and greens — warming for rainy weather',
+        price: 17_000,
+        categoryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Nasi Uduk Komplit',
+        description: 'Fragrant coconut rice served with fried chicken, tempe orek, and sambal',
         price: 25_000,
         categoryId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Spaghetti',
-        description: 'Spaghetti pasta served with rich bolognese sauce',
-        price: 35_000,
+        name: 'Ayam Bakar Madu',
+        description: 'Grilled chicken marinated in honey and spices, served with steamed rice and lalapan',
+        price: 30_000,
         categoryId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Steak',
-        description: 'Grilled beef steak cooked to perfection with black pepper sauce',
-        price: 75_000,
-        categoryId: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: 'Nasi Goreng',
-        description: 'Indonesian fried rice with egg, chicken, and spices',
-        price: 20_000,
-        categoryId: 1,
-        createdAt: new Date(),
-        updatedAt: new Date(),
-      },
-      {
-        name: 'Mie Goreng',
-        description: 'Stir-fried noodles with vegetables, egg, and savory sauce',
+        name: 'Gado-Gado',
+        description: 'Blanched vegetables, boiled egg, and tofu drizzled with rich peanut sauce — light yet filling',
         price: 18_000,
         categoryId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-    
       {
-        name: 'Coke',
-        description: 'Refreshing carbonated cola drink served cold',
-        price: 10_000,
-        categoryId: 2,
+        name: 'Nasi Padang',
+        description: 'Steamed rice with a selection of Padang-style curries, rendang, and sambal',
+        price: 28_000,
+        categoryId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Sprite',
-        description: 'Lemon-lime flavored soda with a crisp taste',
-        price: 10_000,
-        categoryId: 2,
+        name: 'Lontong Sayur',
+        description: 'Rice cake cubes served in spiced coconut milk vegetable curry — filling and comforting',
+        price: 16_000,
+        categoryId: 1,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Orange Juice',
-        description: 'Freshly squeezed orange juice rich in vitamin C',
+        name: 'Ketoprak',
+        description: 'Tofu, rice noodles, and bean sprouts in a tangy peanut-lime dressing — light choice for hot days',
         price: 15_000,
+        categoryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Nasi Kuning',
+        description: 'Golden turmeric rice served with shredded chicken, fried egg, and cucumber',
+        price: 18_000,
+        categoryId: 1,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+
+      // ── Drinks (categoryId: 2) ───────────────────────────────────────
+      // Cold – for hot days
+      {
+        name: 'Es Teh Manis',
+        description: 'Ice-cold sweet tea — the classic thirst-quencher on a hot day',
+        price: 6_000,
         categoryId: 2,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Iced Tea',
-        description: 'Chilled sweet tea perfect for refreshing moments',
+        name: 'Es Jeruk',
+        description: 'Fresh squeezed orange over ice with just the right touch of sweetness',
         price: 8_000,
         categoryId: 2,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Coffee',
-        description: 'Hot brewed coffee with a strong and bold flavor',
+        name: 'Jus Alpukat',
+        description: 'Thick and creamy blended avocado juice with condensed milk — refreshing and filling',
+        price: 15_000,
+        categoryId: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Jus Mangga',
+        description: 'Chilled blended mango juice — sweet and tropical, ideal on sunny afternoons',
         price: 12_000,
         categoryId: 2,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Milkshake',
-        description: 'Creamy milkshake blended with ice cream and milk',
-        price: 20_000,
+        name: 'Es Kelapa Muda',
+        description: 'Young coconut water with soft coconut flesh over crushed ice — naturally cooling',
+        price: 14_000,
         categoryId: 2,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
-    
       {
-        name: 'Chips',
-        description: 'Crispy potato chips lightly salted',
+        name: 'Es Campur',
+        description: 'Mixed dessert drink with nata de coco, cincau, jackfruit, and shaved ice in sweet syrup',
+        price: 15_000,
+        categoryId: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      // Hot – for rainy days
+      {
+        name: 'Teh Hangat',
+        description: 'Hot brewed jasmine tea — simple and soothing on a cool rainy afternoon',
+        price: 5_000,
+        categoryId: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Kopi Hitam',
+        description: 'Strong black coffee brewed with locally sourced robusta beans',
+        price: 8_000,
+        categoryId: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Wedang Jahe',
+        description: 'Hot ginger infusion with palm sugar and pandan — a classic Indonesian remedy for cold weather',
+        price: 8_000,
+        categoryId: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Kopi Susu',
+        description: 'Smooth espresso-style coffee mixed with sweetened condensed milk',
+        price: 12_000,
+        categoryId: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Susu Coklat Panas',
+        description: 'Hot chocolate milk — rich, comforting, and perfect for a rainy day break',
+        price: 10_000,
+        categoryId: 2,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+
+      // ── Snacks (categoryId: 3) ───────────────────────────────────────
+      {
+        name: 'Gorengan Mix',
+        description: 'Assorted crispy fried snacks — tempe, tahu, and bakwan — the go-to quick bite',
         price: 5_000,
         categoryId: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'French Fries',
-        description: 'Golden fried potato sticks with a crispy texture',
-        price: 12_000,
+        name: 'Tempe Mendoan',
+        description: 'Soft and lightly battered fried tempeh — best eaten hot with chili sauce',
+        price: 5_000,
         categoryId: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Onion Rings',
-        description: 'Deep-fried onion rings with crunchy coating',
-        price: 15_000,
+        name: 'Risoles Mayo',
+        description: 'Crispy fried rolls stuffed with egg, chicken, and creamy mayo filling',
+        price: 8_000,
         categoryId: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Popcorn',
-        description: 'Light and fluffy popcorn with buttery flavor',
+        name: 'Pisang Goreng',
+        description: 'Golden battered fried banana — warm, sweet, and perfect with afternoon tea',
+        price: 6_000,
+        categoryId: 3,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      },
+      {
+        name: 'Martabak Mini',
+        description: 'Mini stuffed savory pancake with egg and seasoned ground beef filling',
         price: 10_000,
         categoryId: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Nachos',
-        description: 'Tortilla chips served with cheesy dip',
-        price: 18_000,
+        name: 'Cilok Kuah',
+        description: 'Chewy tapioca balls served in a warm spiced peanut broth — a small but satisfying snack',
+        price: 7_000,
         categoryId: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
       },
       {
-        name: 'Chocolate Bar',
-        description: 'Sweet chocolate snack perfect for quick cravings',
-        price: 7_000,
+        name: 'Klepon',
+        description: 'Pandan rice cake balls filled with palm sugar and rolled in shredded coconut — sweet traditional snack',
+        price: 8_000,
         categoryId: 3,
         createdAt: new Date(),
         updatedAt: new Date(),
-      }
+      },
     ], {});
   },
 
   async down (queryInterface, Sequelize) {
-    /**
-     * Add commands to revert seed here.
-     *
-     * Example:
-     * await queryInterface.bulkDelete('People', null, {});
-     */
+    await queryInterface.bulkDelete('products', null, {});
   }
 };

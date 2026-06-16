@@ -7,6 +7,7 @@ import CheckoutPage from './pages/CheckoutPage.jsx';
 import OrderTracking from './pages/OrderTrackingPage.jsx'
 import OrderHistory from './pages/OrderHistoryPage.jsx'
 import ProfilePage from './pages/ProfilePage.jsx';
+import AccountSettingsPage from './pages/AccountSettingsPage';
 import ProtectedLayout from "./middlewares/ProtectedLayout.jsx"
 import AdminProtectedLayout from "./middlewares/AdminProtectedLayout";
 import { TooltipProvider } from "@/components/ui/tooltip"
@@ -41,6 +42,7 @@ function App() {
               <Route path="/ordertracking/:id" element={<OrderTracking />} />
               <Route path="/orderhistory" element={<OrderHistory />} />
               <Route path="/profile" element={<ProfilePage />} />
+              <Route path="/account" element={<AccountSettingsPage />} />
             </Route>
           </Route>
 
