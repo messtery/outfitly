@@ -1,10 +1,32 @@
 import Product from '../../models/product.js';
 import Category from '../../models/category.js';
 import { Op, literal } from 'sequelize';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const UPLOADS_DIR = path.join(__dirname, '..', '..', 'uploads');
+
+function buildImageUrl(req, filename) {
+  return `${req.protocol}://${req.get('host')}/uploads/${filename}`;
+}
+
+function deleteUploadedFile(imageUrl) {
+  if (!imageUrl) return;
+  try {
+    const filename = imageUrl.split('/uploads/').pop();
+    if (filename) fs.unlinkSync(path.join(UPLOADS_DIR, filename));
+  } catch {
+    // ignore missing files
+  }
+}
 
 export const createProduct = async (req, res) => {
   try {
-    const product = await Product.create(req.body);
+    const { name, price, description, categoryId } = req.body;
+    const image = req.file ? buildImageUrl(req, req.file.filename) : null;
+    const product = await Product.create({ name, price, description, categoryId, image });
     res.status(201).json(product);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -56,7 +78,7 @@ export const getProducts = async (req, res) => {
       where: productWhere,
       limit: limitNum,
       offset,
-      attributes: ['id', 'name', 'price', 'description', 'categoryId'],
+      attributes: ['id', 'name', 'price', 'description', 'image', 'categoryId'],
       include: [{
         model: Category,
         as: 'category',
@@ -97,7 +119,16 @@ export const updateProduct = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
-    await product.update(req.body);
+
+    const { name, price, description, categoryId } = req.body;
+    const updates = { name, price, description, categoryId };
+
+    if (req.file) {
+      deleteUploadedFile(product.image);
+      updates.image = buildImageUrl(req, req.file.filename);
+    }
+
+    await product.update(updates);
     res.json(product);
   } catch (error) {
     res.status(400).json({ error: error.message });
@@ -108,6 +139,7 @@ export const deleteProduct = async (req, res) => {
   try {
     const product = await Product.findByPk(req.params.id);
     if (!product) return res.status(404).json({ error: 'Product not found' });
+    deleteUploadedFile(product.image);
     await product.destroy();
     res.json({ message: 'Product deleted' });
   } catch (error) {
@@ -121,6 +153,8 @@ export const bulkDeleteProducts = async (req, res) => {
     if (!Array.isArray(ids) || ids.length === 0) {
       return res.status(400).json({ error: 'No IDs provided' });
     }
+    const products = await Product.findAll({ where: { id: { [Op.in]: ids } } });
+    products.forEach((p) => deleteUploadedFile(p.image));
     const deleted = await Product.destroy({ where: { id: { [Op.in]: ids } } });
     res.json({ message: `${deleted} product(s) deleted` });
   } catch (error) {
