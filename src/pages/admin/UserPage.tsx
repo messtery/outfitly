@@ -1,4 +1,5 @@
 import { Fragment, useEffect, useState } from "react"
+import { adminFetch } from "@/lib/adminFetch"
 import { useSearchParams } from "react-router-dom"
 import {
   flexRender,
@@ -115,7 +116,7 @@ export default function UserPage() {
   const [roleOptions, setRoleOptions] = useState<RoleOption[]>([])
 
   useEffect(() => {
-    fetch(`${API}/admin/roles/all`)
+    adminFetch(`${API}/admin/roles/all`)
       .then((r) => r.json())
       .then((json) => setRoleOptions(json.data ?? []))
       .catch(() => {})
@@ -137,7 +138,7 @@ export default function UserPage() {
   useEffect(() => {
     let cancelled = false
     setIsLoading(true)
-    fetch(`${API}/admin/users?${buildParams()}`)
+    adminFetch(`${API}/admin/users?${buildParams()}`)
       .then((r) => r.json())
       .then((json) => {
         if (cancelled) return
@@ -180,7 +181,7 @@ export default function UserPage() {
 
   const refetch = () => {
     setIsLoading(true)
-    fetch(`${API}/admin/users?${buildParams()}`)
+    adminFetch(`${API}/admin/users?${buildParams()}`)
       .then((r) => r.json())
       .then((json) => { setUsers(json.data ?? []); setTotalCount(json.meta?.total ?? 0) })
       .catch(() => {})
@@ -200,7 +201,7 @@ export default function UserPage() {
     if (formPassword) body.password = formPassword
     if (!isEditMode) body.password = formPassword
 
-    const res = await fetch(
+    const res = await adminFetch(
       isEditMode ? `${API}/admin/users/${editingId}` : `${API}/admin/users`,
       {
         method: isEditMode ? "PATCH" : "POST",
@@ -218,14 +219,14 @@ export default function UserPage() {
   }
 
   const handleDelete = async (id: number) => {
-    await fetch(`${API}/admin/users/${id}`, { method: "DELETE" })
+    await adminFetch(`${API}/admin/users/${id}`, { method: "DELETE" })
     refetch()
   }
 
   const handleBulkDelete = async () => {
     const ids = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number)
     if (ids.length === 0) return
-    await fetch(`${API}/admin/users/bulk`, {
+    await adminFetch(`${API}/admin/users/bulk`, {
       method: "DELETE",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ ids }),

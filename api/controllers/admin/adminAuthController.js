@@ -15,7 +15,7 @@ export const login = async (req, res) => {
 
     const user = await User.findOne({
       where: { email },
-      include: [{ model: Role, as: 'role', attributes: ['id', 'name'] }],
+      include: [{ model: Role, as: 'role', attributes: ['id', 'name', 'permissions'] }],
     });
 
     if (!user) {
@@ -33,9 +33,11 @@ export const login = async (req, res) => {
       email: user.email,
       roleId: user.roleId,
       roleName: user.role?.name ?? null,
+      permissions: user.isRoot ? ['*'] : (user.role?.permissions ?? []),
+      isRoot: user.isRoot ?? false,
     };
 
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '8h' });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
 
     return res.status(200).json({
       message: 'Login successful',
@@ -59,7 +61,7 @@ export const updateMe = async (req, res) => {
     }
 
     const user = await User.findByPk(req.user.id, {
-      include: [{ model: Role, as: 'role', attributes: ['id', 'name'] }],
+      include: [{ model: Role, as: 'role', attributes: ['id', 'name', 'permissions'] }],
     });
     if (!user) return res.status(404).json({ message: 'User not found' });
 
@@ -75,8 +77,10 @@ export const updateMe = async (req, res) => {
       email: user.email,
       roleId: user.roleId,
       roleName: user.role?.name ?? null,
+      permissions: user.isRoot ? ['*'] : (user.role?.permissions ?? []),
+      isRoot: user.isRoot ?? false,
     };
-    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '8h' });
+    const token = jwt.sign(payload, process.env.JWT_SECRET, { expiresIn: '24h' });
 
     return res.status(200).json({ message: 'Profile updated', token, user: payload });
   } catch (error) {

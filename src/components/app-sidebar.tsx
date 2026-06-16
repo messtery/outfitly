@@ -14,50 +14,21 @@ import {
 import { LayoutDashboardIcon, PackageIcon, TagIcon, ShoppingCartIcon, UsersIcon, CommandIcon, ShieldIcon, UserCogIcon } from "lucide-react"
 import { useAdminAuth } from "@/context/AdminAuthContext"
 
-const data = {
-  navMain: [
-    {
-      title: "Dashboard",
-      url: "/admin/dashboard",
-      icon: <LayoutDashboardIcon />,
-    },
-    {
-      title: "Products",
-      url: "/admin/products",
-      icon: <PackageIcon />,
-    },
-    {
-      title: "Categories",
-      url: "/admin/categories",
-      icon: <TagIcon />,
-    },
-    {
-      title: "Orders",
-      url: "/admin/orders",
-      icon: <ShoppingCartIcon />,
-    },
-    {
-      title: "Customers",
-      url: "/admin/customers",
-      icon: <UsersIcon />,
-    },
-  ],
-  navSystem: [
-    {
-      title: "Roles",
-      url: "/admin/roles",
-      icon: <ShieldIcon />,
-    },
-    {
-      title: "Users",
-      url: "/admin/users",
-      icon: <UserCogIcon />,
-    },
-  ],
-}
+const NAV_MAIN = [
+  { title: "Dashboard", url: "/admin/dashboard", icon: <LayoutDashboardIcon />, permission: null },
+  { title: "Products", url: "/admin/products", icon: <PackageIcon />, permission: "products.view" },
+  { title: "Categories", url: "/admin/categories", icon: <TagIcon />, permission: "categories.view" },
+  { title: "Orders", url: "/admin/orders", icon: <ShoppingCartIcon />, permission: "orders.view" },
+  { title: "Customers", url: "/admin/customers", icon: <UsersIcon />, permission: "customers.view" },
+]
+
+const NAV_SYSTEM = [
+  { title: "Roles", url: "/admin/roles", icon: <ShieldIcon />, permission: "roles.view" },
+  { title: "Users", url: "/admin/users", icon: <UserCogIcon />, permission: "users.view" },
+]
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, logout } = useAdminAuth()
+  const { user, logout, hasPermission } = useAdminAuth()
   const navigate = useNavigate()
 
   const handleLogout = () => {
@@ -70,6 +41,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
     email: user?.email ?? '',
     avatar: '',
   }
+
+  const visibleMain = NAV_MAIN.filter(item => item.permission === null || hasPermission(item.permission))
+  const visibleSystem = NAV_SYSTEM.filter(item => hasPermission(item.permission))
 
   return (
     <Sidebar collapsible="offcanvas" {...props}>
@@ -89,8 +63,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={data.navMain} />
-        <NavMain items={data.navSystem} label="System" />
+        <NavMain items={visibleMain} />
+        {visibleSystem.length > 0 && <NavMain items={visibleSystem} label="System" />}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={sidebarUser} onLogout={handleLogout} />

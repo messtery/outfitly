@@ -5,52 +5,55 @@ import * as productController from '../controllers/admin/productController.js'
 import * as roleController from '../controllers/admin/roleController.js'
 import * as userController from '../controllers/admin/userController.js'
 import * as adminAuthController from '../controllers/admin/adminAuthController.js'
+import requirePermission from '../middlewares/requirePermission.js'
 import { upload } from '../middlewares/uploadMiddleware.js'
-// import * as categoryController from '../controllers/admin/categoryController.js'
 
 const router = express.Router()
 
-router.get('/auth/me', adminAuthController.me);
-router.patch('/auth/me', adminAuthController.updateMe);
-router.patch('/auth/password', adminAuthController.changePassword);
+// Auth (own profile — no extra permission needed)
+router.get('/auth/me', adminAuthController.me)
+router.patch('/auth/me', adminAuthController.updateMe)
+router.patch('/auth/password', adminAuthController.changePassword)
 
-router.post('/customers', customerController.create);
-router.get('/customers', customerController.findAll);
-router.delete('/customers/bulk', customerController.bulkRemove);
-router.get('/customers/:id', customerController.findOne);
-router.patch('/customers/:id', customerController.update);
-router.delete('/customers/:id', customerController.remove);
+// Customers
+router.get('/customers', requirePermission('customers.view'), customerController.findAll)
+router.get('/customers/:id', requirePermission('customers.view'), customerController.findOne)
+router.post('/customers', requirePermission('customers.create'), customerController.create)
+router.patch('/customers/:id', requirePermission('customers.update'), customerController.update)
+router.delete('/customers/bulk', requirePermission('customers.delete'), customerController.bulkRemove)
+router.delete('/customers/:id', requirePermission('customers.delete'), customerController.remove)
 
-router.post('/orders', orderController.create);
-router.get('/orders', orderController.findAll);
-router.delete('/orders/bulk', orderController.bulkRemove);
-router.get('/orders/:id', orderController.findOne);
-router.patch('/orders/:id', orderController.update);
-router.delete('/orders/:id', orderController.remove);;
+// Orders
+router.get('/orders', requirePermission('orders.view'), orderController.findAll)
+router.get('/orders/:id', requirePermission('orders.view'), orderController.findOne)
+router.post('/orders', requirePermission('orders.create'), orderController.create)
+router.patch('/orders/:id', requirePermission('orders.update'), orderController.update)
+router.delete('/orders/bulk', requirePermission('orders.delete'), orderController.bulkRemove)
+router.delete('/orders/:id', requirePermission('orders.delete'), orderController.remove)
 
-// router.use('/orders/:orderId/items', orderItemRoutes);
-// router.use('/api', categoryRoutes);
+// Products
+router.get('/products', requirePermission('products.view'), productController.getProducts)
+router.get('/products/:id', requirePermission('products.view'), productController.getProductById)
+router.post('/products', requirePermission('products.create'), upload.single('image'), productController.createProduct)
+router.put('/products/:id', requirePermission('products.update'), upload.single('image'), productController.updateProduct)
+router.delete('/products/bulk', requirePermission('products.delete'), productController.bulkDeleteProducts)
+router.delete('/products/:id', requirePermission('products.delete'), productController.deleteProduct)
 
-router.post('/products', upload.single('image'), productController.createProduct);
-router.get('/products', productController.getProducts);
-router.delete('/products/bulk', productController.bulkDeleteProducts);
-router.get('/products/:id', productController.getProductById);
-router.put('/products/:id', upload.single('image'), productController.updateProduct);
-router.delete('/products/:id', productController.deleteProduct);
+// Roles
+router.get('/roles/all', requirePermission('roles.view'), roleController.findAllSimple)
+router.get('/roles', requirePermission('roles.view'), roleController.findAll)
+router.get('/roles/:id', requirePermission('roles.view'), roleController.findOne)
+router.post('/roles', requirePermission('roles.create'), roleController.create)
+router.patch('/roles/:id', requirePermission('roles.update'), roleController.update)
+router.delete('/roles/bulk', requirePermission('roles.delete'), roleController.bulkRemove)
+router.delete('/roles/:id', requirePermission('roles.delete'), roleController.remove)
 
-router.get('/roles/all', roleController.findAllSimple);
-router.get('/roles', roleController.findAll);
-router.post('/roles', roleController.create);
-router.delete('/roles/bulk', roleController.bulkRemove);
-router.get('/roles/:id', roleController.findOne);
-router.patch('/roles/:id', roleController.update);
-router.delete('/roles/:id', roleController.remove);
-
-router.get('/users', userController.findAll);
-router.post('/users', userController.create);
-router.delete('/users/bulk', userController.bulkRemove);
-router.get('/users/:id', userController.findOne);
-router.patch('/users/:id', userController.update);
-router.delete('/users/:id', userController.remove);
+// Users
+router.get('/users', requirePermission('users.view'), userController.findAll)
+router.get('/users/:id', requirePermission('users.view'), userController.findOne)
+router.post('/users', requirePermission('users.create'), userController.create)
+router.patch('/users/:id', requirePermission('users.update'), userController.update)
+router.delete('/users/bulk', requirePermission('users.delete'), userController.bulkRemove)
+router.delete('/users/:id', requirePermission('users.delete'), userController.remove)
 
 export default router

@@ -12,6 +12,7 @@ import ProtectedLayout from "./middlewares/ProtectedLayout.jsx"
 import GuestLayout from "./middlewares/GuestLayout.jsx"
 import AdminProtectedLayout from "./middlewares/AdminProtectedLayout";
 import AdminGuestLayout from "./middlewares/AdminGuestLayout";
+import PermissionGate from "./middlewares/PermissionGate";
 import { TooltipProvider } from "@/components/ui/tooltip"
 import AdminLayout from "./layouts/AdminLayout.js";
 import CustomerLayout from "./layouts/CustomerLayout.jsx";
@@ -57,14 +58,14 @@ function App() {
           <Route element={<AdminAuthProvider><AdminProtectedLayout /></AdminAuthProvider>}>
             <Route element={<AdminLayout />}>
               <Route path="/admin/dashboard" element={<DashboardPage />} />
-              <Route path="/admin/products" element={<ProductPage />} />
-              <Route path="/admin/orders" element={<OrderPage />} />
-              <Route path="/admin/orders/:id" element={<OrderDetailPage />} />
-              <Route path="/admin/categories" element={<CategoryPage />} />
-              <Route path="/admin/customers" element={<CustomerPage />} />
-              <Route path="/admin/roles" element={<RolePage />} />
-              <Route path="/admin/users" element={<UserPage />} />
               <Route path="/admin/account" element={<AccountPage />} />
+              <Route path="/admin/products" element={<PermissionGate permission="products.view"><ProductPage /></PermissionGate>} />
+              <Route path="/admin/categories" element={<PermissionGate permission="categories.view"><CategoryPage /></PermissionGate>} />
+              <Route path="/admin/orders" element={<PermissionGate permission="orders.view"><OrderPage /></PermissionGate>} />
+              <Route path="/admin/orders/:id" element={<PermissionGate permission="orders.view"><OrderDetailPage /></PermissionGate>} />
+              <Route path="/admin/customers" element={<PermissionGate permission="customers.view"><CustomerPage /></PermissionGate>} />
+              <Route path="/admin/roles" element={<PermissionGate permission="roles.view"><RolePage /></PermissionGate>} />
+              <Route path="/admin/users" element={<PermissionGate permission="users.view"><UserPage /></PermissionGate>} />
             </Route>
           </Route>
         </Routes>

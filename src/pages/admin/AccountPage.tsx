@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { adminFetch } from '@/lib/adminFetch'
 import { useAdminAuth } from '@/context/AdminAuthContext'
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { Badge } from '@/components/ui/badge'
@@ -43,7 +44,7 @@ export default function AccountPage() {
     }
     setProfileLoading(true)
     try {
-      const res = await fetch(`${API}/admin/auth/me`, {
+      const res = await adminFetch(`${API}/admin/auth/me`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: profileName.trim(), email: profileEmail.trim() }),
@@ -73,7 +74,7 @@ export default function AccountPage() {
     }
     setPasswordLoading(true)
     try {
-      const res = await fetch(`${API}/admin/auth/password`, {
+      const res = await adminFetch(`${API}/admin/auth/password`, {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ currentPassword, newPassword }),
