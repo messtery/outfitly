@@ -31,7 +31,7 @@ export default function OrderHistory({ orders, onRepeat }) {
                 0
               )}
             </span>
-            <OrderActions mode="history" />
+            <OrderActions mode="history" items={order.items} />
           </div>
 
         </Card>
