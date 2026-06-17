@@ -378,7 +378,7 @@ export default function RolePage() {
   return (
     <div className="mx-auto w-full space-y-4 p-6">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="border-l-2 border-primary pl-3">
           <h1 className="text-2xl font-semibold">Roles</h1>
           <p className="text-sm text-muted-foreground">Manage system roles and permissions</p>
         </div>

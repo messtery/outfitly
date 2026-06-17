@@ -43,8 +43,30 @@ type Order = {
   id: number
   total: number
   paymentStatus: "paid" | "pending" | "failed"
+  orderStatus: "processing" | "ready" | "completed" | null
   createdAt: string
   customer: { id: number; name: string; email: string }
+}
+
+const ORDER_STATUS_FLOW = ["processing", "ready", "completed"] as const
+type OrderStatus = typeof ORDER_STATUS_FLOW[number]
+
+const ORDER_STATUS_LABELS: Record<string, string> = {
+  processing: "Processing",
+  ready: "Ready",
+  completed: "Completed",
+}
+
+const ORDER_STATUS_COLORS: Record<string, string> = {
+  processing: "bg-blue-100 text-blue-800",
+  ready: "bg-yellow-100 text-yellow-800",
+  completed: "bg-green-100 text-green-800",
+}
+
+function nextOrderStatus(current: OrderStatus | null): OrderStatus | null {
+  if (current === null) return "processing"
+  const idx = ORDER_STATUS_FLOW.indexOf(current)
+  return idx < ORDER_STATUS_FLOW.length - 1 ? ORDER_STATUS_FLOW[idx + 1] : null
 }
 
 const PAGE_SIZE_OPTIONS = [10, 25, 50] as const
@@ -198,6 +220,17 @@ export default function OrderPage() {
     refetch()
   }
 
+  const handleAdvanceStatus = async (order: Order) => {
+    const next = nextOrderStatus(order.orderStatus)
+    if (!next) return
+    await adminFetch(`${API}/admin/orders/${order.id}`, {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ orderStatus: next }),
+    })
+    refetch()
+  }
+
   const handleBulkDelete = async () => {
     const ids = Object.keys(rowSelection).filter((k) => rowSelection[k]).map(Number)
     if (ids.length === 0) return
@@ -243,10 +276,27 @@ export default function OrderPage() {
     },
     {
       accessorKey: "paymentStatus",
-      header: "Status",
+      header: "Payment",
       cell: ({ getValue }) => <StatusBadge status={getValue() as string} />,
       enableSorting: true,
       enableColumnFilter: true,
+    },
+    {
+      accessorKey: "orderStatus",
+      header: "Order Status",
+      cell: ({ row }) => {
+        const { paymentStatus, orderStatus } = row.original
+        if (paymentStatus !== "paid") return <span className="text-muted-foreground text-xs">—</span>
+        const label = orderStatus ? ORDER_STATUS_LABELS[orderStatus] : "Received"
+        const cls = orderStatus ? ORDER_STATUS_COLORS[orderStatus] : "bg-gray-100 text-gray-700"
+        return (
+          <span className={`inline-flex items-center rounded-md px-2 py-0.5 text-xs font-semibold ${cls}`}>
+            {label}
+          </span>
+        )
+      },
+      enableSorting: false,
+      enableColumnFilter: false,
     },
     {
       accessorKey: "createdAt",
@@ -261,16 +311,25 @@ export default function OrderPage() {
     {
       id: "actions",
       header: "",
-      cell: ({ row }) => (
-        <div className="flex gap-1.5">
-          <Button variant="outline" size="icon-sm" onClick={() => openEditModal(row.original)}>
-            <PencilIcon />
-          </Button>
-          <Button variant="destructive" size="icon-sm" onClick={() => handleDelete(row.original.id)}>
-            <Trash2Icon />
-          </Button>
-        </div>
-      ),
+      cell: ({ row }) => {
+        const order = row.original
+        const next = order.paymentStatus === "paid" ? nextOrderStatus(order.orderStatus) : null
+        return (
+          <div className="flex gap-1.5">
+            {next && (
+              <Button variant="outline" size="sm" className="h-7 text-xs" onClick={() => handleAdvanceStatus(order)}>
+                Mark {ORDER_STATUS_LABELS[next]}
+              </Button>
+            )}
+            <Button variant="outline" size="icon-sm" onClick={() => openEditModal(order)}>
+              <PencilIcon />
+            </Button>
+            <Button variant="destructive" size="icon-sm" onClick={() => handleDelete(order.id)}>
+              <Trash2Icon />
+            </Button>
+          </div>
+        )
+      },
       enableSorting: false,
       enableColumnFilter: false,
     },
@@ -305,7 +364,7 @@ export default function OrderPage() {
   return (
     <div className="mx-auto w-full space-y-4 p-6">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="border-l-2 border-primary pl-3">
           <h1 className="text-2xl font-semibold">Orders</h1>
           <p className="text-sm text-muted-foreground">View and manage customer orders</p>
         </div>

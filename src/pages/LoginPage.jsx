@@ -17,32 +17,34 @@ import { useNavigate } from "react-router-dom"
 export default function LoginPage() {
 	const [email, setEmail] = useState("")
 	const [password, setPassword] = useState("")
+	const [error, setError] = useState("")
 
 	const navigate = useNavigate()
 
-	const handleSubmit = (e) => {
+	const handleSubmit = async (e) => {
 		e.preventDefault()
+		setError("")
 
-		fetch('http://localhost:3000/api/auth/login', {
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({
-				email,
-				password,
-			}),
-		})
-			.then((res) => res.json())
-			.then((res) => {
-				localStorage.setItem('token', res.token)
-				localStorage.setItem('customer', JSON.stringify(res.customer))
+		try {
+			const res = await fetch('http://localhost:3000/api/auth/login', {
+				method: 'POST',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ email, password }),
+			})
 
-				navigate('/menu')
-			})
-			.catch((err) => {
-				alert('Login failed')
-			})
+			const data = await res.json()
+
+			if (!res.ok) {
+				setError(data.message || 'Invalid email or password')
+				return
+			}
+
+			localStorage.setItem('token', data.token)
+			localStorage.setItem('customer', JSON.stringify(data.customer))
+			navigate('/menu')
+		} catch {
+			setError('Unable to connect. Please try again.')
+		}
 	}
 	
 	return (
@@ -88,6 +90,9 @@ export default function LoginPage() {
 					</div>
 				</CardContent>
 				<CardFooter className="flex-col gap-2">
+					{error && (
+						<p className="text-sm text-red-500 w-full text-center">{error}</p>
+					)}
 					<Button type="submit" className="w-full">
 						Login
 					</Button>

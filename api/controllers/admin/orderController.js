@@ -68,7 +68,7 @@ export const findAll = async (req, res) => {
       where: orderWhere,
       limit: limitNum,
       offset: (pageNum - 1) * limitNum,
-      attributes: ['id', 'customerId', 'total', 'paymentStatus', 'createdAt'],
+      attributes: ['id', 'customerId', 'total', 'paymentStatus', 'orderStatus', 'createdAt'],
       include: [{
         model: Customer,
         as: 'customer',
@@ -117,10 +117,22 @@ export const update = async (req, res) => {
     const order = await Order.findByPk(req.params.id);
     if (!order) return res.status(404).json({ message: 'Order not found.' });
 
-    const { customerId, paymentStatus, items } = req.body;
+    const { customerId, paymentStatus, orderStatus, items } = req.body;
+
+    const ORDER_STATUS_FLOW = ['processing', 'ready', 'completed'];
+    if (orderStatus !== undefined) {
+      if (order.paymentStatus !== 'paid') {
+        return res.status(400).json({ message: 'Order status can only be updated for paid orders.' });
+      }
+      if (!ORDER_STATUS_FLOW.includes(orderStatus)) {
+        return res.status(400).json({ message: 'Invalid order status.' });
+      }
+    }
+
     await order.update({
       ...(customerId !== undefined && { customerId }),
       ...(paymentStatus !== undefined && { paymentStatus }),
+      ...(orderStatus !== undefined && { orderStatus }),
     });
 
     if (Array.isArray(items) && items.length > 0) {

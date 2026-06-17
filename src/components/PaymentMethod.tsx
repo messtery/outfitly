@@ -46,7 +46,7 @@ export default function PaymentMethod() {
             if (data.data.invoiceUrl) {
                 window.open(data.data.invoiceUrl, '_blank')
             }
-            navigate(`/ordertracking/${data.data.id}`)
+            navigate(`/orders/${data.data.id}`)
         } catch (err) {
             console.error(err)
         } finally {

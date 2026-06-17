@@ -6,7 +6,7 @@ import {
   SidebarMenuButton,
   SidebarMenuItem,
 } from "@/components/ui/sidebar"
-import { useNavigate } from "react-router-dom"
+import { useLocation, useNavigate } from "react-router-dom"
 
 type Item = {
   title: string
@@ -22,6 +22,7 @@ export function NavMain({
   label?: string
 }) {
   const navigate = useNavigate()
+  const { pathname } = useLocation()
 
   return (
     <SidebarGroup>
@@ -30,7 +31,11 @@ export function NavMain({
         <SidebarMenu>
           {items.map((item) => (
             <SidebarMenuItem key={item.title} onClick={() => navigate(item.url)}>
-              <SidebarMenuButton tooltip={item.title}>
+              <SidebarMenuButton
+                tooltip={item.title}
+                isActive={pathname.startsWith(item.url)}
+                className="data-[active=true]:text-sidebar-primary data-[active=true]:bg-sidebar-primary/10"
+              >
                 {item.icon}
                 <span>{item.title}</span>
               </SidebarMenuButton>

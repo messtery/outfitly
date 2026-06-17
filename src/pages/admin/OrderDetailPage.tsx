@@ -43,7 +43,7 @@ export default function OrderDetailPage() {
             <Button variant="outline" onClick={() => navigate("/admin/orders")}>
               ← Back
             </Button>
-            <h1 className="text-xl font-semibold">Order Detail</h1>
+            <h1 className="text-xl font-semibold text-primary">Order Detail</h1>
           </div>
 
           <Card>

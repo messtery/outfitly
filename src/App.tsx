@@ -44,8 +44,8 @@ function App() {
               <Route path="/menu" element={<Menu />} />
               <Route path="/cart" element={<CartPage />} />
               <Route path="/checkout" element={<CheckoutPage />} />
-              <Route path="/ordertracking/:id" element={<OrderTracking />} />
-              <Route path="/orderhistory" element={<OrderHistory />} />
+              <Route path="/orders" element={<OrderHistory />} />
+              <Route path="/orders/:id" element={<OrderTracking />} />
               <Route path="/profile" element={<ProfilePage />} />
               <Route path="/account" element={<AccountSettingsPage />} />
             </Route>

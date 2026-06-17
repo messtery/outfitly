@@ -53,7 +53,8 @@ export const findAll = async (req, res) => {
       },
       limit: limitNum,
       offset: (pageNum - 1) * limitNum,
-      attributes: ['id', 'customerId', 'total', 'paymentStatus', 'createdAt'],
+      attributes: ['id', 'customerId', 'total', 'paymentStatus', 'paymentMethod', 'createdAt'],
+      order: [['createdAt', 'DESC']],
       include: [
         {
           model: OrderItem,

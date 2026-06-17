@@ -29,6 +29,15 @@ const Order = sequelize.define('orders', {
     allowNull: false,
     defaultValue: 'pending'
   },
+  paymentMethod: {
+    type: DataTypes.ENUM('cash', 'qris', 'transfer'),
+    allowNull: true,
+  },
+  orderStatus: {
+    type: DataTypes.ENUM('processing', 'ready', 'completed'),
+    allowNull: true,
+    defaultValue: null,
+  },
   invoiceId: {
     type: DataTypes.STRING,
     allowNull: true,

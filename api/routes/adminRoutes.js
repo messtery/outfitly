@@ -5,10 +5,14 @@ import * as productController from '../controllers/admin/productController.js'
 import * as roleController from '../controllers/admin/roleController.js'
 import * as userController from '../controllers/admin/userController.js'
 import * as adminAuthController from '../controllers/admin/adminAuthController.js'
+import * as dashboardController from '../controllers/admin/dashboardController.js'
 import requirePermission from '../middlewares/requirePermission.js'
 import { upload } from '../middlewares/uploadMiddleware.js'
 
 const router = express.Router()
+
+// Dashboard
+router.get('/dashboard/stats', dashboardController.getStats)
 
 // Auth (own profile — no extra permission needed)
 router.get('/auth/me', adminAuthController.me)

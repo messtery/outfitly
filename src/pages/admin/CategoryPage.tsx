@@ -264,7 +264,7 @@ export default function CategoryPage() {
   return (
     <div className="mx-auto w-full space-y-4 p-6">
       <div className="flex items-center justify-between">
-        <div>
+        <div className="border-l-2 border-primary pl-3">
           <h1 className="text-2xl font-semibold">Categories</h1>
           <p className="text-sm text-muted-foreground">Manage product categories</p>
         </div>

@@ -17,14 +17,20 @@ const pageTitles = {
   "/cart": "Cart",
   "/profile": "Profile",
   "/checkout": "Checkout",
-  "/orderhistory": "Order History",
+  "/orders": "Order History",
   "/account": "Account Settings",
 }
 
 function getTitle(pathname) {
   if (pageTitles[pathname]) return pageTitles[pathname]
-  if (pathname.startsWith("/ordertracking")) return "Track Order"
+  if (pathname.startsWith("/orders/")) return "Track Order"
   return "Mikro Canteen"
+}
+
+function getBackDestination(pathname) {
+  if (pathname.startsWith("/orders/")) return "/orders"
+  if (pathname === "/orders") return "/profile"
+  return -1
 }
 
 export default function CustomerLayout() {
@@ -37,24 +43,19 @@ export default function CustomerLayout() {
   return (
     <div className="min-h-screen flex flex-col bg-background">
       {/* Header */}
-      <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+      <header className="sticky top-0 z-50 bg-primary">
         <div className="flex h-14 items-center gap-2 px-4">
           {!isMainPage && (
             <Button
               variant="ghost"
               size="icon"
-              className="-ml-2 shrink-0"
-              onClick={() => navigate(-1)}
+              className="-ml-2 shrink-0 text-primary-foreground hover:bg-primary-foreground/15 hover:text-primary-foreground"
+              onClick={() => navigate(getBackDestination(location.pathname))}
             >
               <ArrowLeft className="h-5 w-5" />
             </Button>
           )}
-          <span className="font-semibold text-base">{title}</span>
-          {isMainPage && (
-            <Button variant="ghost" size="icon" className="ml-auto">
-              <Bell className="h-5 w-5" />
-            </Button>
-          )}
+          <span className="font-semibold text-base text-primary-foreground">{title}</span>
         </div>
       </header>
 

@@ -94,7 +94,7 @@ export default function AccountPage() {
 
   return (
     <div className="mx-auto w-full max-w-3xl space-y-6 p-6">
-      <div>
+      <div className="border-l-2 border-primary pl-3">
         <h1 className="text-2xl font-semibold">My Account</h1>
         <p className="text-sm text-muted-foreground">Manage your profile and security settings</p>
       </div>

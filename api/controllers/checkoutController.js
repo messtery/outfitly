@@ -9,7 +9,7 @@ const xendit = new Xendit({ secretKey: process.env.XENDIT_KEY });
 
 const XENDIT_PAYMENT_METHODS = {
   qris: ['QRIS'],
-  transfer: ['CALLBACK_VIRTUAL_ACCOUNT'],
+  transfer: ['BCA', 'BNI', 'BRI', 'MANDIRI', 'PERMATA', 'BSI', 'CIMB'],
 };
 
 const VALID_METHODS = ['cash', 'qris', 'transfer'];
@@ -38,6 +38,7 @@ export const checkout = async (req, res) => {
       customerId,
       total,
       paymentStatus: 'pending',
+      paymentMethod,
       items: cart.items.map((item) => ({
         productId: item.productId,
         qty: item.qty,
@@ -67,8 +68,8 @@ export const checkout = async (req, res) => {
           email: customer.email,
         },
         paymentMethods: XENDIT_PAYMENT_METHODS[paymentMethod],
-        successRedirectUrl: `http://localhost:5173/ordertracking/${order.id}`,
-        failureRedirectUrl: `http://localhost:5173/ordertracking/${order.id}`,
+        successRedirectUrl: `http://localhost:5173/orders/${order.id}`,
+        failureRedirectUrl: `http://localhost:5173/orders/${order.id}`,
       },
     });
 

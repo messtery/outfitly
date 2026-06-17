@@ -3,8 +3,11 @@ import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import OrderItem from "./OrderItem"
 import OrderActions from "./OrderActions"
+import { useNavigate } from "react-router-dom"
 
 export default function OrderHistory({ orders, onRepeat }) {
+  const navigate = useNavigate()
+
   return (
     <div className="space-y-4">
       {orders.map((order) => (
@@ -14,9 +17,12 @@ export default function OrderHistory({ orders, onRepeat }) {
             <Badge variant="outline">{order.paymentStatus}</Badge>
           </div>
 
-          <p className="text-sm text-muted-foreground">
-            {new Date(order.createdAt).toLocaleString()}
-          </p>
+          <div className="flex items-center gap-3 text-sm text-muted-foreground">
+            <span>{new Date(order.createdAt).toLocaleString()}</span>
+            {order.paymentMethod && (
+              <span className="capitalize">· {order.paymentMethod}</span>
+            )}
+          </div>
 
           <div className="space-y-2">
             {order.items.map((item, idx) => (
@@ -31,7 +37,16 @@ export default function OrderHistory({ orders, onRepeat }) {
                 0
               )}
             </span>
-            <OrderActions mode="history" items={order.items} />
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate(`/orders/${order.id}`)}
+              >
+                View Detail
+              </Button>
+              <OrderActions mode="history" items={order.items} />
+            </div>
           </div>
 
         </Card>

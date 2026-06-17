@@ -55,7 +55,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               className="data-[slot=sidebar-menu-button]:p-1.5!"
             >
               <a href="#">
-                <CommandIcon className="size-5!" />
+                <CommandIcon className="size-5! text-primary" />
                 <span className="text-base font-semibold">Mikro Canteen</span>
               </a>
             </SidebarMenuButton>
@@ -64,7 +64,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={visibleMain} />
-        {visibleSystem.length > 0 && <NavMain items={visibleSystem} label="System" />}
+        {visibleSystem.length > 0 && <NavMain items={visibleSystem} label="Access Control" />}
       </SidebarContent>
       <SidebarFooter>
         <NavUser user={sidebarUser} onLogout={handleLogout} />
